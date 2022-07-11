@@ -1,0 +1,1134 @@
+{
+    "meta": {
+        "version": "1",
+        "type": "dashboard",
+        "name": "Live Data-Template",
+        "description": "template created from dashboard: Live Data"
+    },
+    "content": {
+        "data": {
+            "type": "dashboard",
+            "attributes": {
+                "name": "Live Data",
+                "description": ""
+            },
+            "relationships": {
+                "label": {
+                    "data": []
+                },
+                "cell": {
+                    "data": [
+                        {
+                            "type": "cell",
+                            "id": "09a4af35fa6c6000"
+                        },
+                        {
+                            "type": "cell",
+                            "id": "09a4af35fb2c6000"
+                        },
+                        {
+                            "type": "cell",
+                            "id": "09a4af35fbac6000"
+                        },
+                        {
+                            "type": "cell",
+                            "id": "09a4af35fc6c6000"
+                        },
+                        {
+                            "type": "cell",
+                            "id": "09a4af35fd2c6000"
+                        },
+                        {
+                            "type": "cell",
+                            "id": "09a4af35fdac6000"
+                        },
+                        {
+                            "type": "cell",
+                            "id": "09a4af35fe6c6000"
+                        },
+                        {
+                            "type": "cell",
+                            "id": "09a4af35feec6000"
+                        },
+                        {
+                            "type": "cell",
+                            "id": "09a4af35ffac6000"
+                        },
+                        {
+                            "type": "cell",
+                            "id": "09a731b26f7aa000"
+                        },
+                        {
+                            "type": "cell",
+                            "id": "09a731d6f8baa000"
+                        }
+                    ]
+                },
+                "variable": {
+                    "data": []
+                }
+            }
+        },
+        "included": [
+            {
+                "id": "09a4af35fa6c6000",
+                "type": "cell",
+                "attributes": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 3,
+                    "h": 2
+                },
+                "relationships": {
+                    "view": {
+                        "data": {
+                            "type": "view",
+                            "id": "09a4af35fa6c6000"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "09a4af35fb2c6000",
+                "type": "cell",
+                "attributes": {
+                    "x": 3,
+                    "y": 0,
+                    "w": 3,
+                    "h": 2
+                },
+                "relationships": {
+                    "view": {
+                        "data": {
+                            "type": "view",
+                            "id": "09a4af35fb2c6000"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "09a4af35fbac6000",
+                "type": "cell",
+                "attributes": {
+                    "x": 0,
+                    "y": 2,
+                    "w": 3,
+                    "h": 2
+                },
+                "relationships": {
+                    "view": {
+                        "data": {
+                            "type": "view",
+                            "id": "09a4af35fbac6000"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "09a4af35fc6c6000",
+                "type": "cell",
+                "attributes": {
+                    "x": 3,
+                    "y": 2,
+                    "w": 3,
+                    "h": 2
+                },
+                "relationships": {
+                    "view": {
+                        "data": {
+                            "type": "view",
+                            "id": "09a4af35fc6c6000"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "09a4af35fd2c6000",
+                "type": "cell",
+                "attributes": {
+                    "x": 0,
+                    "y": 4,
+                    "w": 3,
+                    "h": 2
+                },
+                "relationships": {
+                    "view": {
+                        "data": {
+                            "type": "view",
+                            "id": "09a4af35fd2c6000"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "09a4af35fdac6000",
+                "type": "cell",
+                "attributes": {
+                    "x": 3,
+                    "y": 4,
+                    "w": 3,
+                    "h": 2
+                },
+                "relationships": {
+                    "view": {
+                        "data": {
+                            "type": "view",
+                            "id": "09a4af35fdac6000"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "09a4af35fe6c6000",
+                "type": "cell",
+                "attributes": {
+                    "x": 6,
+                    "y": 0,
+                    "w": 4,
+                    "h": 2
+                },
+                "relationships": {
+                    "view": {
+                        "data": {
+                            "type": "view",
+                            "id": "09a4af35fe6c6000"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "09a4af35feec6000",
+                "type": "cell",
+                "attributes": {
+                    "x": 6,
+                    "y": 2,
+                    "w": 4,
+                    "h": 1
+                },
+                "relationships": {
+                    "view": {
+                        "data": {
+                            "type": "view",
+                            "id": "09a4af35feec6000"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "09a4af35ffac6000",
+                "type": "cell",
+                "attributes": {
+                    "x": 6,
+                    "y": 3,
+                    "w": 4,
+                    "h": 1
+                },
+                "relationships": {
+                    "view": {
+                        "data": {
+                            "type": "view",
+                            "id": "09a4af35ffac6000"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "09a731b26f7aa000",
+                "type": "cell",
+                "attributes": {
+                    "x": 6,
+                    "y": 4,
+                    "w": 4,
+                    "h": 1
+                },
+                "relationships": {
+                    "view": {
+                        "data": {
+                            "type": "view",
+                            "id": "09a731b26f7aa000"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "09a731d6f8baa000",
+                "type": "cell",
+                "attributes": {
+                    "x": 6,
+                    "y": 5,
+                    "w": 4,
+                    "h": 1
+                },
+                "relationships": {
+                    "view": {
+                        "data": {
+                            "type": "view",
+                            "id": "09a731d6f8baa000"
+                        }
+                    }
+                }
+            },
+            {
+                "type": "view",
+                "id": "09a4af35fa6c6000",
+                "attributes": {
+                    "name": "FL Wing Damage",
+                    "properties": {
+                        "shape": "chronograf-v2",
+                        "type": "single-stat",
+                        "queries": [
+                            {
+                                "text": "from(bucket: \"f1-telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"live\")\n  |> filter(fn: (r) => r[\"_field\"] == \"front_left_wing_damage\")\n  |> yield(name: \"last\")",
+                                "editMode": "advanced",
+                                "name": "",
+                                "builderConfig": {
+                                    "buckets": [],
+                                    "tags": [
+                                        {
+                                            "key": "_measurement",
+                                            "values": [],
+                                            "aggregateFunctionType": "filter"
+                                        }
+                                    ],
+                                    "functions": [
+                                        {
+                                            "name": "mean"
+                                        }
+                                    ],
+                                    "aggregateWindow": {
+                                        "period": "auto",
+                                        "fillValues": false
+                                    }
+                                }
+                            }
+                        ],
+                        "prefix": "",
+                        "tickPrefix": "",
+                        "suffix": "%",
+                        "tickSuffix": "",
+                        "colors": [
+                            {
+                                "id": "base",
+                                "type": "text",
+                                "hex": "#00C9FF",
+                                "name": "laser",
+                                "value": 0
+                            }
+                        ],
+                        "decimalPlaces": {
+                            "isEnforced": true,
+                            "digits": 0
+                        },
+                        "note": "",
+                        "showNoteWhenEmpty": false
+                    }
+                }
+            },
+            {
+                "type": "view",
+                "id": "09a4af35fb2c6000",
+                "attributes": {
+                    "name": "FR Wing Damage",
+                    "properties": {
+                        "shape": "chronograf-v2",
+                        "type": "single-stat",
+                        "queries": [
+                            {
+                                "text": "from(bucket: \"f1-telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"live\")\n  |> filter(fn: (r) => r[\"_field\"] == \"front_right_wing_damage\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
+                                "editMode": "advanced",
+                                "name": "",
+                                "builderConfig": {
+                                    "buckets": [],
+                                    "tags": [
+                                        {
+                                            "key": "_measurement",
+                                            "values": [],
+                                            "aggregateFunctionType": "filter"
+                                        }
+                                    ],
+                                    "functions": [
+                                        {
+                                            "name": "mean"
+                                        }
+                                    ],
+                                    "aggregateWindow": {
+                                        "period": "auto",
+                                        "fillValues": false
+                                    }
+                                }
+                            }
+                        ],
+                        "prefix": "",
+                        "tickPrefix": "",
+                        "suffix": "%",
+                        "tickSuffix": "",
+                        "colors": [
+                            {
+                                "id": "base",
+                                "type": "text",
+                                "hex": "#00C9FF",
+                                "name": "laser",
+                                "value": 0
+                            }
+                        ],
+                        "decimalPlaces": {
+                            "isEnforced": true,
+                            "digits": 0
+                        },
+                        "note": "",
+                        "showNoteWhenEmpty": false
+                    }
+                }
+            },
+            {
+                "type": "view",
+                "id": "09a4af35fbac6000",
+                "attributes": {
+                    "name": "FL Tyre Wear",
+                    "properties": {
+                        "shape": "chronograf-v2",
+                        "queries": [
+                            {
+                                "text": "from(bucket: \"f1-telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"live\")\n  |> filter(fn: (r) => r[\"_field\"] == \"tyres_wear_fl\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
+                                "editMode": "advanced",
+                                "name": "",
+                                "builderConfig": {
+                                    "buckets": [],
+                                    "tags": [
+                                        {
+                                            "key": "_measurement",
+                                            "values": [],
+                                            "aggregateFunctionType": "filter"
+                                        }
+                                    ],
+                                    "functions": [
+                                        {
+                                            "name": "mean"
+                                        }
+                                    ],
+                                    "aggregateWindow": {
+                                        "period": "auto",
+                                        "fillValues": false
+                                    }
+                                }
+                            }
+                        ],
+                        "axes": {
+                            "x": {
+                                "bounds": [
+                                    "",
+                                    ""
+                                ],
+                                "label": "",
+                                "prefix": "",
+                                "suffix": "",
+                                "base": "10",
+                                "scale": "linear"
+                            },
+                            "y": {
+                                "bounds": [
+                                    "0",
+                                    "100"
+                                ],
+                                "label": "",
+                                "prefix": "",
+                                "suffix": "",
+                                "base": "10",
+                                "scale": "linear"
+                            }
+                        },
+                        "type": "line-plus-single-stat",
+                        "legend": {},
+                        "colors": [
+                            {
+                                "id": "base",
+                                "type": "text",
+                                "hex": "#4ED8A0",
+                                "name": "rainforest",
+                                "value": 0
+                            },
+                            {
+                                "id": "twenty",
+                                "type": "text",
+                                "hex": "#7CE490",
+                                "name": "honeydew",
+                                "value": 20
+                            },
+                            {
+                                "id": "fourty",
+                                "type": "text",
+                                "hex": "#FFD255",
+                                "name": "thunder",
+                                "value": 40
+                            },
+                            {
+                                "id": "fifty",
+                                "type": "text",
+                                "hex": "#F48D38",
+                                "name": "tiger",
+                                "value": 50
+                            }
+                        ],
+                        "prefix": "",
+                        "suffix": "%",
+                        "decimalPlaces": {
+                            "isEnforced": true,
+                            "digits": 0
+                        },
+                        "note": "",
+                        "showNoteWhenEmpty": false,
+                        "xColumn": "_time",
+                        "generateXAxisTicks": [],
+                        "xTotalTicks": 0,
+                        "xTickStart": 0,
+                        "xTickStep": 0,
+                        "yColumn": "_value",
+                        "generateYAxisTicks": [],
+                        "yTotalTicks": 0,
+                        "yTickStart": 0,
+                        "yTickStep": 0,
+                        "shadeBelow": true,
+                        "position": "overlaid",
+                        "timeFormat": "",
+                        "hoverDimension": "auto",
+                        "legendColorizeRows": true,
+                        "legendOpacity": 1,
+                        "legendOrientationThreshold": 100000000
+                    }
+                }
+            },
+            {
+                "type": "view",
+                "id": "09a4af35fc6c6000",
+                "attributes": {
+                    "name": "FR Tyre Wear",
+                    "properties": {
+                        "shape": "chronograf-v2",
+                        "queries": [
+                            {
+                                "text": "from(bucket: \"f1-telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"live\")\n  |> filter(fn: (r) => r[\"_field\"] == \"tyres_wear_fr\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
+                                "editMode": "advanced",
+                                "name": "",
+                                "builderConfig": {
+                                    "buckets": [],
+                                    "tags": [
+                                        {
+                                            "key": "_measurement",
+                                            "values": [],
+                                            "aggregateFunctionType": "filter"
+                                        }
+                                    ],
+                                    "functions": [
+                                        {
+                                            "name": "mean"
+                                        }
+                                    ],
+                                    "aggregateWindow": {
+                                        "period": "auto",
+                                        "fillValues": false
+                                    }
+                                }
+                            }
+                        ],
+                        "axes": {
+                            "x": {
+                                "bounds": [
+                                    "",
+                                    ""
+                                ],
+                                "label": "",
+                                "prefix": "",
+                                "suffix": "",
+                                "base": "10",
+                                "scale": "linear"
+                            },
+                            "y": {
+                                "bounds": [
+                                    "0",
+                                    "100"
+                                ],
+                                "label": "",
+                                "prefix": "",
+                                "suffix": "",
+                                "base": "10",
+                                "scale": "linear"
+                            }
+                        },
+                        "type": "line-plus-single-stat",
+                        "legend": {},
+                        "colors": [
+                            {
+                                "id": "base",
+                                "type": "text",
+                                "hex": "#4ED8A0",
+                                "name": "rainforest",
+                                "value": 0
+                            },
+                            {
+                                "id": "twenty",
+                                "type": "text",
+                                "hex": "#7CE490",
+                                "name": "honeydew",
+                                "value": 20
+                            },
+                            {
+                                "id": "fourty",
+                                "type": "text",
+                                "hex": "#FFD255",
+                                "name": "thunder",
+                                "value": 40
+                            },
+                            {
+                                "id": "fifty",
+                                "type": "text",
+                                "hex": "#F48D38",
+                                "name": "tiger",
+                                "value": 50
+                            }
+                        ],
+                        "prefix": "",
+                        "suffix": "%",
+                        "decimalPlaces": {
+                            "isEnforced": true,
+                            "digits": 0
+                        },
+                        "note": "",
+                        "showNoteWhenEmpty": false,
+                        "xColumn": "_time",
+                        "generateXAxisTicks": [],
+                        "xTotalTicks": 0,
+                        "xTickStart": 0,
+                        "xTickStep": 0,
+                        "yColumn": "_value",
+                        "generateYAxisTicks": [],
+                        "yTotalTicks": 0,
+                        "yTickStart": 0,
+                        "yTickStep": 0,
+                        "shadeBelow": false,
+                        "position": "overlaid",
+                        "timeFormat": "",
+                        "hoverDimension": "auto",
+                        "legendColorizeRows": true,
+                        "legendOpacity": 1,
+                        "legendOrientationThreshold": 100000000
+                    }
+                }
+            },
+            {
+                "type": "view",
+                "id": "09a4af35fd2c6000",
+                "attributes": {
+                    "name": "RL Tyre Wear",
+                    "properties": {
+                        "shape": "chronograf-v2",
+                        "queries": [
+                            {
+                                "text": "from(bucket: \"f1-telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"live\")\n  |> filter(fn: (r) => r[\"_field\"] == \"tyres_wear_rl\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
+                                "editMode": "advanced",
+                                "name": "",
+                                "builderConfig": {
+                                    "buckets": [],
+                                    "tags": [
+                                        {
+                                            "key": "_measurement",
+                                            "values": [],
+                                            "aggregateFunctionType": "filter"
+                                        }
+                                    ],
+                                    "functions": [
+                                        {
+                                            "name": "mean"
+                                        }
+                                    ],
+                                    "aggregateWindow": {
+                                        "period": "auto",
+                                        "fillValues": false
+                                    }
+                                }
+                            }
+                        ],
+                        "axes": {
+                            "x": {
+                                "bounds": [
+                                    "",
+                                    ""
+                                ],
+                                "label": "",
+                                "prefix": "",
+                                "suffix": "",
+                                "base": "10",
+                                "scale": "linear"
+                            },
+                            "y": {
+                                "bounds": [
+                                    "0",
+                                    "100"
+                                ],
+                                "label": "",
+                                "prefix": "",
+                                "suffix": "",
+                                "base": "10",
+                                "scale": "linear"
+                            }
+                        },
+                        "type": "line-plus-single-stat",
+                        "legend": {},
+                        "colors": [
+                            {
+                                "id": "base",
+                                "type": "text",
+                                "hex": "#4ED8A0",
+                                "name": "rainforest",
+                                "value": 0
+                            },
+                            {
+                                "id": "twenty",
+                                "type": "text",
+                                "hex": "#7CE490",
+                                "name": "honeydew",
+                                "value": 20
+                            },
+                            {
+                                "id": "fourty",
+                                "type": "text",
+                                "hex": "#FFD255",
+                                "name": "thunder",
+                                "value": 40
+                            },
+                            {
+                                "id": "fifty",
+                                "type": "text",
+                                "hex": "#F48D38",
+                                "name": "tiger",
+                                "value": 50
+                            }
+                        ],
+                        "prefix": "",
+                        "suffix": "%",
+                        "decimalPlaces": {
+                            "isEnforced": true,
+                            "digits": 0
+                        },
+                        "note": "",
+                        "showNoteWhenEmpty": false,
+                        "xColumn": "_time",
+                        "generateXAxisTicks": [],
+                        "xTotalTicks": 0,
+                        "xTickStart": 0,
+                        "xTickStep": 0,
+                        "yColumn": "_value",
+                        "generateYAxisTicks": [],
+                        "yTotalTicks": 0,
+                        "yTickStart": 0,
+                        "yTickStep": 0,
+                        "shadeBelow": false,
+                        "position": "overlaid",
+                        "timeFormat": "",
+                        "hoverDimension": "auto",
+                        "legendColorizeRows": true,
+                        "legendOpacity": 1,
+                        "legendOrientationThreshold": 100000000
+                    }
+                }
+            },
+            {
+                "type": "view",
+                "id": "09a4af35fdac6000",
+                "attributes": {
+                    "name": "RR Tyre Wear",
+                    "properties": {
+                        "shape": "chronograf-v2",
+                        "queries": [
+                            {
+                                "text": "from(bucket: \"f1-telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"live\")\n  |> filter(fn: (r) => r[\"_field\"] == \"tyres_wear_rr\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
+                                "editMode": "advanced",
+                                "name": "",
+                                "builderConfig": {
+                                    "buckets": [],
+                                    "tags": [
+                                        {
+                                            "key": "_measurement",
+                                            "values": [],
+                                            "aggregateFunctionType": "filter"
+                                        }
+                                    ],
+                                    "functions": [
+                                        {
+                                            "name": "mean"
+                                        }
+                                    ],
+                                    "aggregateWindow": {
+                                        "period": "auto",
+                                        "fillValues": false
+                                    }
+                                }
+                            }
+                        ],
+                        "axes": {
+                            "x": {
+                                "bounds": [
+                                    "",
+                                    ""
+                                ],
+                                "label": "",
+                                "prefix": "",
+                                "suffix": "",
+                                "base": "10",
+                                "scale": "linear"
+                            },
+                            "y": {
+                                "bounds": [
+                                    "0",
+                                    "100"
+                                ],
+                                "label": "",
+                                "prefix": "",
+                                "suffix": "",
+                                "base": "10",
+                                "scale": "linear"
+                            }
+                        },
+                        "type": "line-plus-single-stat",
+                        "legend": {},
+                        "colors": [
+                            {
+                                "id": "base",
+                                "type": "text",
+                                "hex": "#4ED8A0",
+                                "name": "rainforest",
+                                "value": 0
+                            },
+                            {
+                                "id": "twenty",
+                                "type": "text",
+                                "hex": "#7CE490",
+                                "name": "honeydew",
+                                "value": 20
+                            },
+                            {
+                                "id": "fourty",
+                                "type": "text",
+                                "hex": "#FFD255",
+                                "name": "thunder",
+                                "value": 40
+                            },
+                            {
+                                "id": "fifty",
+                                "type": "text",
+                                "hex": "#F48D38",
+                                "name": "tiger",
+                                "value": 50
+                            }
+                        ],
+                        "prefix": "",
+                        "suffix": "%",
+                        "decimalPlaces": {
+                            "isEnforced": true,
+                            "digits": 0
+                        },
+                        "note": "",
+                        "showNoteWhenEmpty": false,
+                        "xColumn": "_time",
+                        "generateXAxisTicks": [],
+                        "xTotalTicks": 0,
+                        "xTickStart": 0,
+                        "xTickStep": 0,
+                        "yColumn": "_value",
+                        "generateYAxisTicks": [],
+                        "yTotalTicks": 0,
+                        "yTickStart": 0,
+                        "yTickStep": 0,
+                        "shadeBelow": false,
+                        "position": "overlaid",
+                        "timeFormat": "",
+                        "hoverDimension": "auto",
+                        "legendColorizeRows": true,
+                        "legendOpacity": 1,
+                        "legendOrientationThreshold": 100000000
+                    }
+                }
+            },
+            {
+                "type": "view",
+                "id": "09a4af35fe6c6000",
+                "attributes": {
+                    "name": "Current weather",
+                    "properties": {
+                        "shape": "chronograf-v2",
+                        "type": "single-stat",
+                        "queries": [
+                            {
+                                "text": "from(bucket: \"f1-telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"live\")\n  |> filter(fn: (r) => r[\"_field\"] == \"weather\")\n  |> yield(name: \"last\")",
+                                "editMode": "advanced",
+                                "name": "",
+                                "builderConfig": {
+                                    "buckets": [],
+                                    "tags": [
+                                        {
+                                            "key": "_measurement",
+                                            "values": [],
+                                            "aggregateFunctionType": "filter"
+                                        }
+                                    ],
+                                    "functions": [
+                                        {
+                                            "name": "mean"
+                                        }
+                                    ],
+                                    "aggregateWindow": {
+                                        "period": "auto",
+                                        "fillValues": false
+                                    }
+                                }
+                            }
+                        ],
+                        "prefix": "",
+                        "tickPrefix": "",
+                        "suffix": "",
+                        "tickSuffix": "",
+                        "colors": [
+                            {
+                                "id": "base",
+                                "type": "text",
+                                "hex": "#00C9FF",
+                                "name": "laser",
+                                "value": 0
+                            }
+                        ],
+                        "decimalPlaces": {
+                            "isEnforced": true,
+                            "digits": 2
+                        },
+                        "note": "",
+                        "showNoteWhenEmpty": false
+                    }
+                }
+            },
+            {
+                "type": "view",
+                "id": "09a4af35feec6000",
+                "attributes": {
+                    "name": "Forecast 1",
+                    "properties": {
+                        "shape": "chronograf-v2",
+                        "type": "single-stat",
+                        "queries": [
+                            {
+                                "text": "from(bucket: \"f1-telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"live\")\n  |> filter(fn: (r) => r[\"_field\"] == \"forecast_0\")\n  |> yield(name: \"last\")",
+                                "editMode": "advanced",
+                                "name": "",
+                                "builderConfig": {
+                                    "buckets": [],
+                                    "tags": [
+                                        {
+                                            "key": "_measurement",
+                                            "values": [],
+                                            "aggregateFunctionType": "filter"
+                                        }
+                                    ],
+                                    "functions": [
+                                        {
+                                            "name": "mean"
+                                        }
+                                    ],
+                                    "aggregateWindow": {
+                                        "period": "auto",
+                                        "fillValues": false
+                                    }
+                                }
+                            }
+                        ],
+                        "prefix": "",
+                        "tickPrefix": "",
+                        "suffix": "",
+                        "tickSuffix": "",
+                        "colors": [
+                            {
+                                "id": "base",
+                                "type": "text",
+                                "hex": "#00C9FF",
+                                "name": "laser",
+                                "value": 0
+                            }
+                        ],
+                        "decimalPlaces": {
+                            "isEnforced": true,
+                            "digits": 2
+                        },
+                        "note": "",
+                        "showNoteWhenEmpty": false
+                    }
+                }
+            },
+            {
+                "type": "view",
+                "id": "09a4af35ffac6000",
+                "attributes": {
+                    "name": "Forecast 2",
+                    "properties": {
+                        "shape": "chronograf-v2",
+                        "type": "single-stat",
+                        "queries": [
+                            {
+                                "text": "from(bucket: \"f1-telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"live\")\n  |> filter(fn: (r) => r[\"_field\"] == \"forecast_1\")\n  |> yield(name: \"last\")",
+                                "editMode": "advanced",
+                                "name": "",
+                                "builderConfig": {
+                                    "buckets": [],
+                                    "tags": [
+                                        {
+                                            "key": "_measurement",
+                                            "values": [],
+                                            "aggregateFunctionType": "filter"
+                                        }
+                                    ],
+                                    "functions": [
+                                        {
+                                            "name": "mean"
+                                        }
+                                    ],
+                                    "aggregateWindow": {
+                                        "period": "auto",
+                                        "fillValues": false
+                                    }
+                                }
+                            }
+                        ],
+                        "prefix": "",
+                        "tickPrefix": "",
+                        "suffix": "",
+                        "tickSuffix": "",
+                        "colors": [
+                            {
+                                "id": "base",
+                                "type": "text",
+                                "hex": "#00C9FF",
+                                "name": "laser",
+                                "value": 0
+                            }
+                        ],
+                        "decimalPlaces": {
+                            "isEnforced": true,
+                            "digits": 2
+                        },
+                        "note": "",
+                        "showNoteWhenEmpty": false
+                    }
+                }
+            },
+            {
+                "type": "view",
+                "id": "09a731b26f7aa000",
+                "attributes": {
+                    "name": "Forecast 3",
+                    "properties": {
+                        "shape": "chronograf-v2",
+                        "type": "single-stat",
+                        "queries": [
+                            {
+                                "text": "from(bucket: \"f1-telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"live\")\n  |> filter(fn: (r) => r[\"_field\"] == \"forecast_2\")\n  |> yield(name: \"last\")",
+                                "editMode": "advanced",
+                                "name": "",
+                                "builderConfig": {
+                                    "buckets": [],
+                                    "tags": [
+                                        {
+                                            "key": "_measurement",
+                                            "values": [],
+                                            "aggregateFunctionType": "filter"
+                                        }
+                                    ],
+                                    "functions": [
+                                        {
+                                            "name": "mean"
+                                        }
+                                    ],
+                                    "aggregateWindow": {
+                                        "period": "auto",
+                                        "fillValues": false
+                                    }
+                                }
+                            }
+                        ],
+                        "prefix": "",
+                        "tickPrefix": "",
+                        "suffix": "",
+                        "tickSuffix": "",
+                        "colors": [
+                            {
+                                "id": "base",
+                                "type": "text",
+                                "hex": "#00C9FF",
+                                "name": "laser",
+                                "value": 0
+                            }
+                        ],
+                        "decimalPlaces": {
+                            "isEnforced": true,
+                            "digits": 2
+                        },
+                        "note": "",
+                        "showNoteWhenEmpty": false
+                    }
+                }
+            },
+            {
+                "type": "view",
+                "id": "09a731d6f8baa000",
+                "attributes": {
+                    "name": "Forecast 4",
+                    "properties": {
+                        "shape": "chronograf-v2",
+                        "type": "single-stat",
+                        "queries": [
+                            {
+                                "text": "from(bucket: \"f1-telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"live\")\n  |> filter(fn: (r) => r[\"_field\"] == \"forecast_3\")\n  |> yield(name: \"last\")",
+                                "editMode": "advanced",
+                                "name": "",
+                                "builderConfig": {
+                                    "buckets": [],
+                                    "tags": [
+                                        {
+                                            "key": "_measurement",
+                                            "values": [],
+                                            "aggregateFunctionType": "filter"
+                                        }
+                                    ],
+                                    "functions": [
+                                        {
+                                            "name": "mean"
+                                        }
+                                    ],
+                                    "aggregateWindow": {
+                                        "period": "auto",
+                                        "fillValues": false
+                                    }
+                                }
+                            }
+                        ],
+                        "prefix": "",
+                        "tickPrefix": "",
+                        "suffix": "",
+                        "tickSuffix": "",
+                        "colors": [
+                            {
+                                "id": "base",
+                                "type": "text",
+                                "hex": "#00C9FF",
+                                "name": "laser",
+                                "value": 0
+                            }
+                        ],
+                        "decimalPlaces": {
+                            "isEnforced": true,
+                            "digits": 2
+                        },
+                        "note": "",
+                        "showNoteWhenEmpty": false
+                    }
+                }
+            }
+        ]
+    },
+    "labels": []
+}

@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "f1-telemetry"
+classifiers = [
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+]
+description = "F1 telemetry data collection and visualisation"
+authors = ["Gabriele N. Tornetta <phoenix1987@gmail.com>"]
+license = "MIT"
+packages = [
+  {include = "f1_telemetry"},
+]
+readme = "README.md"
+repository = "https://github.com/P403n1x87/f1-telemetry"
+version = "0.0.0"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+f1-packets = "^2022.1.1"
+influxdb-client = "^1.30.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+
+[tool.poetry.urls]
+issues = "https://github.com/P403n1x87/f1-telemetry/issues"
+
+[tool.poetry.scripts]
+f1-tel = "f1_telemetry.__main__:main"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry_core>=1.0", "poetry-dynamic-versioning"]

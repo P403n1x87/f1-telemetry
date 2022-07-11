@@ -1,0 +1,275 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+
+  <link href="style.css" rel="stylesheet"> 
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.0.4/d3.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
+  <script src="plots.js"></script>
+  
+  <script type="module">
+    import { InfluxDB, Point } from 'https://unpkg.com/@influxdata/influxdb-client/dist/index.browser.mjs'
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const org = urlParams.get("org")
+    const url = "http://localhost:8086"
+    const token = urlParams.get("token")
+
+    const influxDB = new InfluxDB({ url, token })
+
+    function setLapData(data) {
+        const totalTime = document.getElementById("total-time")
+        const sector1 = document.getElementById("s1")
+        const sector2 = document.getElementById("s2")
+        const sector3 = document.getElementById("s3")
+        const tyreLabel = document.getElementById("tyre-label")
+        const tyreCircle = document.getElementById("tyre-circle")
+        const tyreAge = document.getElementById("tyre-age")
+
+        tyreCircle.setAttribute("class", "tyre-none");
+        tyreLabel.innerHTML = "";
+        tyreAge.innerHTML = "";
+
+        let formatSector = function (time) {
+            let ms = time % 1000
+            let s = Math.floor(time / 1000)
+
+            return `${s}.${String(ms).padStart(3, '0')}`
+        }
+
+        let c = 0;
+        for (let d in data) {
+            if (c == 4) {
+                break;
+            }
+            switch (data[d]._field) {
+                case  "total_time_ms":
+                    let ms = data[d]._value % 1000;
+                    let s = Math.floor(data[d]._value / 1000);
+                    let m = Math.floor(s / 60);
+                    s = s % 60;
+                    totalTime.innerHTML = `${m}:${s}.${String(ms).padStart(3, '0')}`;
+                    c++;
+                    break;
+                case "sector_1_ms":
+                    sector1.innerHTML = formatSector(data[d]._value);
+                    c++;
+                    break;
+                case "sector_2_ms":
+                    sector2.innerHTML = formatSector(data[d]._value);
+                    c++;
+                    break;
+                case "sector_3_ms":
+                    sector3.innerHTML = formatSector(data[d]._value);
+                    c++;
+                    break;
+                case "tyre_compound":
+                    tyreLabel.innerHTML = data[d]._value.substring(0, 1);
+                    tyreCircle.setAttribute("class", "tyre-" + data[d]._value.toLowerCase());
+                    break;
+                case "tyre_age":
+                    tyreAge.innerHTML = data[d]._value + (data[d]._value == 1 ? " LAP" : " LAPS");
+                    break;
+            }
+        }
+    }
+
+    function queryLapData(session, lap) {
+        const queryApi = influxDB.getQueryApi(org)
+
+        const measurement = session + "-" + lap;
+        const date = session.substring(0, 10);
+
+        var raw_data = [], time = []
+        var min_time = -1
+        queryApi.queryRows(
+            `from(bucket: "f1-telemetry")
+            |> range(start: ${date}T00:00:00Z, stop: ${date}T23:59:59Z)
+            |> filter(fn: (r) => r["_measurement"] == "${measurement}")
+            `, {
+            next(row, tableMeta) {
+                const obj = tableMeta.toObject(row)
+                const timestamp = toTimestamp(obj._time)
+                if (min_time < 0) {
+                    min_time = timestamp
+                }
+                else {
+                    min_time = Math.min(min_time, timestamp)
+                }
+                time.push(timestamp)
+                raw_data.push(obj)
+            },
+            error(error) {
+                console.log('QUERY FAILED: ' + error)
+            },
+            complete() {
+                time = time.map(t => (t - min_time) / 1000)
+                
+                setLapData(raw_data)
+
+                plotTrack(raw_data, time)
+
+                plotInput(raw_data, time)
+                plotSpeed(raw_data, time)
+                plotGears(raw_data, time)
+
+                plotTyreSurfaceTemp(raw_data, time)
+                plotTyreInnerTemp(raw_data, time)
+
+                bindEventHandlers()
+            },
+        });
+    }
+
+    function updateLaps(e, session) {
+        const queryApi = influxDB.getQueryApi(org)
+
+        let data = []
+        queryApi.queryRows(
+            `import "strings"
+            import "influxdata/influxdb/schema"
+            schema.measurements(bucket: "f1-telemetry")
+            |> filter(fn: (r) => strings.substring(end: 16, start: 0, v: r._value) == "${session}")
+`, {
+            next(row, tableMeta) {
+                data.push(tableMeta.toObject(row)._value.substring(17))
+            },
+            error(error) {
+                log('QUERY FAILED', error)
+            },
+            complete() {
+                var item = d3.select('#lap_list')
+                    .selectAll('li')
+                    .data(data);
+
+                // Enter
+                item
+                    .enter()
+                    .append('li')
+                    .attr('class', 'item')
+                    .on("click", (e, lap) => queryLapData(session, lap))
+                    .text(function(d) { return d });
+
+                // Update
+                item
+                    .text(function(d) { return d });
+
+                // Exit
+                item.exit().remove();
+            },
+        })
+    }
+
+    function updateSessions() {
+        const queryApi = influxDB.getQueryApi(org)
+
+        let data = new Set()
+        queryApi.queryRows(
+            `import "influxdata/influxdb/schema"
+            schema.measurements(bucket: "f1-telemetry")`, {
+            next(row, tableMeta) {
+                if (tableMeta.toObject(row)._value != "live")
+                    data.add(tableMeta.toObject(row)._value.substring(0, 16))
+            },
+            error(error) {
+                log('QUERY FAILED', error)
+            },
+            complete() {
+                var item = d3.select('#session_list')
+                    .selectAll('li')
+                    .data(data);
+
+                // Enter
+                item
+                    .enter()
+                    .append('li')
+                    .attr('class', 'item')
+                    .on("click", updateLaps)
+                    .text(function(d) { return d });
+
+                // Update
+                item
+                    .text(function(d) { return d });
+
+                // Exit
+                item.exit().remove();
+            },
+        })
+    }
+
+    updateSessions()
+  </script>
+</head>
+<body>
+    <div class="flex flex-col text-gray-50 h-screen">
+        <div class="flex flex-row p-2 bg-red-900 bg-opacity-20">
+            <div id="session" class="p-1 flex flex-col">
+                <div class="p-1 text-center font-bold">SESSIONS</div>
+                <div class="p-2 max-h-48 h-48 w-48 max-w-48 overflow-y-auto">
+                    <ul class="text-sm text-center" id="session_list"/>
+                </div>
+            </div>
+            <div id="laps" class="p-1 flex flex-col">
+                <div class="p-1 text-center font-bold">LAPS</div>
+                <div class="p-2 max-h-48 h-48 w-32 max-w-32 overflow-y-auto">
+                    <ul class="text-sm text-center" id="lap_list"/>
+                </div>
+            </div>
+            <div class="p-1 text-center flex-col min-w-48 w-48">
+                <div class="p-1 text-center font-bold">TRACK</div>
+                <div class="flex-grow-0" id="track"></div>
+            </div>
+            <div class="p-1 text-center flex-col flex-grow">
+                <div class="p-1 text-center font-bold" id="lap-label">LAP</div>
+                <div class="flex-grow-0 flex-col">
+                    <div class="flex-grow-0 text-5xl p-4 h-24" id="total-time"></div>
+                    <div class="flex flex-grow flex-row">
+                        <div class="flex-grow flex-col">
+                            <div class="p-1 text-center font-bold m-1 bg-yellow-500">S1</div>
+                            <div class="p-1 text-center font-bold" id="s1"></div>
+                        </div>
+                        <div class="flex-grow flex-col">
+                            <div class="p-1 text-center font-bold m-1 bg-green-500">S2</div>
+                            <div class="p-1 text-center font-bold" id="s2"></div>
+                        </div>
+                        <div class="flex-grow flex-col">
+                            <div class="p-1 text-center font-bold m-1 bg-purple-500">S3</div>
+                            <div class="p-1 text-center font-bold" id="s3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-1 text-center flex-col">
+                <div class="flex-grow-0 flex-col">
+                    <div class="p-1 text-center font-bold" id="lap-label">TYRE</div>
+                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 160 160" height="160" width="160">
+                        <g>
+                            <circle style="fill:none;stroke-width:12;" class="tyre-none" id="tyre-circle" cx="80" cy="80" r="48" />
+                            <text x="80" y="104" style="font-weight:bold;font-size:64px;font-family:sans-serif;fill:#fff;" id="tyre-label" text-anchor="middle"></text>
+                        </g>
+                    </svg>
+                    <span id="tyre-age"></span>
+                </div>
+            </div>
+        </div>
+        <div id="dash" class="flex flex-row flex-grow p-2">
+            <div class="flex flex-col flex-grow">
+                <div id="input"></div>
+                <div id="speed"></div>
+                <div id="gears"></div>
+            </div>
+            <div class="flex flex-col flex-grow">
+                <div id="tstemp"></div>
+                <div id="titemp"></div>
+                <div id="twear"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
