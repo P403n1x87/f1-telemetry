@@ -1,5 +1,5 @@
 from f1.handler import PacketHandler
-from f1.packets import TYRES
+from f1.packets import TYRES, TRACKS
 
 from datetime import datetime
 
@@ -26,6 +26,10 @@ def _weather(packet):
     }[packet.weather]
 
 
+def _track_name(packet):
+    return TRACKS[packet.track_id]
+
+
 class TelemetryCollector(PacketHandler):
     def __init__(self, listener, sink):
         super().__init__(listener)
@@ -42,7 +46,7 @@ class TelemetryCollector(PacketHandler):
         self.tyre_age = None
 
     def init_session(self):
-        self.session = datetime.now().strftime("%Y-%m-%d@%H:%M")
+        self.session = self.track + "#" + datetime.now().strftime("%Y-%m-%d@%H:%M")
 
     def on_new_lap(self):
         self.sector = 0
@@ -63,6 +67,7 @@ class TelemetryCollector(PacketHandler):
     def handle_SessionData(self, packet):
         if self.session_id != packet.session_link_identifier:
             self.session_id = packet.session_link_identifier
+            self.track = _track_name(packet)
             self.init_session()
 
         # Weather data
@@ -141,7 +146,7 @@ class TelemetryCollector(PacketHandler):
                 sector_time = getattr(data, f"sector{self.sector}_time_in_ms")
                 if sector_time > 0:
                     self.sectors[self.sector - 1] = sector_time
-            self.emit_tyre_data()
+            # self.emit_tyre_data()
 
         if data.current_lap_num != self.lap:
             total_time = data.last_lap_time_in_ms

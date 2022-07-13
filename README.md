@@ -21,12 +21,12 @@ configured with an `f1-telemetry` bucket.
 f1-tel <org> <token>
 ~~~
 
-The repository has a very basic web application for time-series visualisations.
-With InfluxDB still running, open the `webapp/index.html` page in the browser
-with the `org` and `token` parameters, e.g.
+This also serves a very basic web application for time-series visualisations.
+With InfluxDB still running, navigate to  `http://localhost:20776/index.html`
+page in the browser with the `org` and `token` parameters, e.g.
 
 ~~~
-file:///C:/Users/Gabriele/Projects/f1-telemetry/webapp/index.html?org=P403n1x87&token=NLyjW4ml8XuTPTwCbtC5PC1Z-JJ6lwjAm7B1-ScM_XP9N_eoCkIGTmm3wHrC92cQVsMmKofgqbx6PM-ZZgVQKw==
+http://localhost:20776/index.html?org=P403n1x87&token=NLyjW4ml8XuTPTwCbtC5PC1Z-JJ6lwjAm7B1-ScM_XP9N_eoCkIGTmm3wHrC92cQVsMmKofgqbx6PM-ZZgVQKw==
 ~~~
 
 ## InfluxDB Boards

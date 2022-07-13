@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
 <head>
+  <title>F1 Telemetry</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
@@ -9,11 +10,12 @@
   <link href="style.css" rel="stylesheet"> 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.0.4/d3.min.js"></script>
-  <script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
+  <script src="utils.js"></script>
   <script src="plots.js"></script>
+  <script src="view.js"></script>
   
   <script type="module">
-    import { InfluxDB, Point } from 'https://unpkg.com/@influxdata/influxdb-client/dist/index.browser.mjs'
+    import { InfluxDB, Point } from 'https://cdn.jsdelivr.net/npm/@influxdata/influxdb-client@1.27.0/dist/index.browser.mjs'
 
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -23,71 +25,16 @@
 
     const influxDB = new InfluxDB({ url, token })
 
-    function setLapData(data) {
-        const totalTime = document.getElementById("total-time")
-        const sector1 = document.getElementById("s1")
-        const sector2 = document.getElementById("s2")
-        const sector3 = document.getElementById("s3")
-        const tyreLabel = document.getElementById("tyre-label")
-        const tyreCircle = document.getElementById("tyre-circle")
-        const tyreAge = document.getElementById("tyre-age")
-
-        tyreCircle.setAttribute("class", "tyre-none");
-        tyreLabel.innerHTML = "";
-        tyreAge.innerHTML = "";
-
-        let formatSector = function (time) {
-            let ms = time % 1000
-            let s = Math.floor(time / 1000)
-
-            return `${s}.${String(ms).padStart(3, '0')}`
-        }
-
-        let c = 0;
-        for (let d in data) {
-            if (c == 4) {
-                break;
-            }
-            switch (data[d]._field) {
-                case  "total_time_ms":
-                    let ms = data[d]._value % 1000;
-                    let s = Math.floor(data[d]._value / 1000);
-                    let m = Math.floor(s / 60);
-                    s = s % 60;
-                    totalTime.innerHTML = `${m}:${s}.${String(ms).padStart(3, '0')}`;
-                    c++;
-                    break;
-                case "sector_1_ms":
-                    sector1.innerHTML = formatSector(data[d]._value);
-                    c++;
-                    break;
-                case "sector_2_ms":
-                    sector2.innerHTML = formatSector(data[d]._value);
-                    c++;
-                    break;
-                case "sector_3_ms":
-                    sector3.innerHTML = formatSector(data[d]._value);
-                    c++;
-                    break;
-                case "tyre_compound":
-                    tyreLabel.innerHTML = data[d]._value.substring(0, 1);
-                    tyreCircle.setAttribute("class", "tyre-" + data[d]._value.toLowerCase());
-                    break;
-                case "tyre_age":
-                    tyreAge.innerHTML = data[d]._value + (data[d]._value == 1 ? " LAP" : " LAPS");
-                    break;
-            }
-        }
-    }
-
-    function queryLapData(session, lap) {
+    function queryLapData(session, lap, queried) {
         const queryApi = influxDB.getQueryApi(org)
 
         const measurement = session + "-" + lap;
-        const date = session.substring(0, 10);
+        const i = session.indexOf("#");
+        const date = session.substring(i + 1, i + 11);
 
-        var raw_data = [], time = []
-        var min_time = -1
+
+        var values = {}, time = []
+        var minTime = -1
         queryApi.queryRows(
             `from(bucket: "f1-telemetry")
             |> range(start: ${date}T00:00:00Z, stop: ${date}T23:59:59Z)
@@ -96,49 +43,72 @@
             next(row, tableMeta) {
                 const obj = tableMeta.toObject(row)
                 const timestamp = toTimestamp(obj._time)
-                if (min_time < 0) {
-                    min_time = timestamp
+                if (minTime < 0) {
+                    minTime = timestamp
                 }
                 else {
-                    min_time = Math.min(min_time, timestamp)
+                    minTime = Math.min(minTime, timestamp)
                 }
-                time.push(timestamp)
-                raw_data.push(obj)
+                var series = values[obj._field]
+                if (series == undefined) {
+                    series = []
+                    values[obj._field] = series
+                }
+
+                series.push(obj._value)
+
+                if (time.length < series.length) {
+                    time.push(timestamp)
+                }
             },
             error(error) {
                 console.log('QUERY FAILED: ' + error)
             },
             complete() {
-                time = time.map(t => (t - min_time) / 1000)
-                
-                setLapData(raw_data)
-
-                plotTrack(raw_data, time)
-
-                plotInput(raw_data, time)
-                plotSpeed(raw_data, time)
-                plotGears(raw_data, time)
-
-                plotTyreSurfaceTemp(raw_data, time)
-                plotTyreInnerTemp(raw_data, time)
-
-                bindEventHandlers()
+                time = time.map(t => (t - minTime) / 1000)
+                queried(time, values)
             },
         });
     }
 
+    function updateLapData(e, lap) {
+        d3.select('#laps_list')
+            .selectAll('li')
+            .classed("highlighted", false);
+                
+        d3.select(this).classed("highlighted", true);
+
+        queryLapData(session, lap, (time, values) => {
+            setLapData(values);
+            plotLapTraces(time, values);
+        })
+    }
+
     function updateLaps(e, session) {
+        var item = d3.select('#lap_list')
+            .selectAll('li')
+            .remove()
+            ;
+
         const queryApi = influxDB.getQueryApi(org)
 
         let data = []
+
+        d3.select('#session_list')
+            .selectAll('li')
+            .classed("highlighted", false);
+                
+        d3.select(this).classed("highlighted", true);
+
         queryApi.queryRows(
             `import "strings"
             import "influxdata/influxdb/schema"
             schema.measurements(bucket: "f1-telemetry")
-            |> filter(fn: (r) => strings.substring(end: 16, start: 0, v: r._value) == "${session}")
-`, {
+            |> filter(fn: (r) => strings.hasPrefix(prefix: "${session}", v: r._value))
+            `, {
             next(row, tableMeta) {
-                data.push(tableMeta.toObject(row)._value.substring(17))
+                const fullLapName = tableMeta.toObject(row)._value
+                data.push(fullLapName.substring(fullLapName.indexOf("@") + 7))
             },
             error(error) {
                 log('QUERY FAILED', error)
@@ -146,14 +116,25 @@
             complete() {
                 var item = d3.select('#lap_list')
                     .selectAll('li')
-                    .data(data);
+                    .data(data)
+                    ;
 
                 // Enter
                 item
                     .enter()
                     .append('li')
                     .attr('class', 'item')
-                    .on("click", (e, lap) => queryLapData(session, lap))
+                    .on("click", function foo(e, lap) {
+                        d3.select('#lap_list')
+                            .selectAll('li')
+                            .classed("highlighted", false);
+                                
+                        d3.select(this).classed("highlighted", true);
+
+                        queryLapData(session, lap, (time, values) => {
+                        setLapData(values);
+                        plotLapTraces(time, values);
+                    })})
                     .text(function(d) { return d });
 
                 // Update
@@ -169,13 +150,26 @@
     function updateSessions() {
         const queryApi = influxDB.getQueryApi(org)
 
-        let data = new Set()
+        let seenData = new Set()
+        let data = []
         queryApi.queryRows(
             `import "influxdata/influxdb/schema"
             schema.measurements(bucket: "f1-telemetry")`, {
             next(row, tableMeta) {
-                if (tableMeta.toObject(row)._value != "live")
-                    data.add(tableMeta.toObject(row)._value.substring(0, 16))
+                if (tableMeta.toObject(row)._value != "live") {
+                    const sessionId = tableMeta.toObject(row)._value;
+                    let i = sessionId.indexOf("@") + 1;
+                    if (i == 0) {
+                        return;
+                    }
+                    let sessionPrefix = sessionId.substring(0, i + 5);
+                    
+                    if (seenData.has(sessionPrefix)) {
+                        return;
+                    }
+                    data.push(sessionPrefix);
+                    seenData.add(sessionPrefix);
+                }
             },
             error(error) {
                 log('QUERY FAILED', error)
@@ -183,7 +177,8 @@
             complete() {
                 var item = d3.select('#session_list')
                     .selectAll('li')
-                    .data(data);
+                    .data(data.reverse())
+                    ;
 
                 // Enter
                 item
@@ -191,11 +186,11 @@
                     .append('li')
                     .attr('class', 'item')
                     .on("click", updateLaps)
-                    .text(function(d) { return d });
+                    .html(parseSessionId);
 
                 // Update
                 item
-                    .text(function(d) { return d });
+                    .html(parseSessionId);
 
                 // Exit
                 item.exit().remove();
@@ -208,38 +203,38 @@
 </head>
 <body>
     <div class="flex flex-col text-gray-50 h-screen">
-        <div class="flex flex-row p-2 bg-red-900 bg-opacity-20">
+        <div class="flex flex-row py-2 bg-red-900 bg-opacity-20">
             <div id="session" class="p-1 flex flex-col">
                 <div class="p-1 text-center font-bold">SESSIONS</div>
                 <div class="p-2 max-h-48 h-48 w-48 max-w-48 overflow-y-auto">
-                    <ul class="text-sm text-center" id="session_list"/>
+                    <ul class="text-sm" id="session_list"/>
                 </div>
             </div>
             <div id="laps" class="p-1 flex flex-col">
                 <div class="p-1 text-center font-bold">LAPS</div>
-                <div class="p-2 max-h-48 h-48 w-32 max-w-32 overflow-y-auto">
+                <div class="p-2 max-h-48 h-48 w-24 max-w-24 overflow-y-auto">
                     <ul class="text-sm text-center" id="lap_list"/>
                 </div>
             </div>
-            <div class="p-1 text-center flex-col min-w-48 w-48">
+            <div class="p-1 text-center flex flex-col min-w-48 w-48">
                 <div class="p-1 text-center font-bold">TRACK</div>
-                <div class="flex-grow-0" id="track"></div>
+                <div class="flex flex-grow max-h-48" id="track"></div>
             </div>
             <div class="p-1 text-center flex-col flex-grow">
                 <div class="p-1 text-center font-bold" id="lap-label">LAP</div>
                 <div class="flex-grow-0 flex-col">
                     <div class="flex-grow-0 text-5xl p-4 h-24" id="total-time"></div>
-                    <div class="flex flex-grow flex-row">
+                    <div class="flex flex-grow-0 w-64 m-auto flex-row">
                         <div class="flex-grow flex-col">
-                            <div class="p-1 text-center font-bold m-1 bg-yellow-500">S1</div>
+                            <div class="p-1 text-center font-bold bg-slate-900">S1</div>
                             <div class="p-1 text-center font-bold" id="s1"></div>
                         </div>
                         <div class="flex-grow flex-col">
-                            <div class="p-1 text-center font-bold m-1 bg-green-500">S2</div>
+                            <div class="p-1 text-center font-bold bg-slate-900">S2</div>
                             <div class="p-1 text-center font-bold" id="s2"></div>
                         </div>
                         <div class="flex-grow flex-col">
-                            <div class="p-1 text-center font-bold m-1 bg-purple-500">S3</div>
+                            <div class="p-1 text-center font-bold bg-slate-900">S3</div>
                             <div class="p-1 text-center font-bold" id="s3"></div>
                         </div>
                     </div>
@@ -260,14 +255,14 @@
         </div>
         <div id="dash" class="flex flex-row flex-grow p-2">
             <div class="flex flex-col flex-grow">
-                <div id="input"></div>
-                <div id="speed"></div>
-                <div id="gears"></div>
+                <div id="input" class="plot"></div>
+                <div id="speed" class="plot"></div>
+                <div id="gears" class="plot"></div>
             </div>
             <div class="flex flex-col flex-grow">
-                <div id="tstemp"></div>
-                <div id="titemp"></div>
-                <div id="twear"></div>
+                <div id="tstemp" class="plot"></div>
+                <div id="titemp" class="plot"></div>
+                <div id="twear" class="plot"></div>
             </div>
         </div>
     </div>

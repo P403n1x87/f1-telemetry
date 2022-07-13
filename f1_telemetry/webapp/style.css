@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap');
+
+body {
+    font-family: 'Titillium Web', sans-serif;
+    background-color: #100f0f;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+body ul {
+    overflow: hidden;
+}
+
+.tyre-none {
+    stroke: rgb(105, 105, 105);
+}
+
+.tyre-soft {
+    stroke: rgb(175, 12, 12);
+}
+
+.tyre-medium {
+    stroke: rgb(255, 230, 0);
+}
+
+.tyre-hard {
+    stroke: white;
+}
+
+.tyre-inter {
+    stroke: green;
+}
+
+.tyre-wet {
+    stroke: rgb(21, 44, 148);
+}
+
+.v-line {
+    pointer-events: none;
+}
+
+.plot {
+    padding: 12px;
+}
+
+li .location {
+    font-weight: bold;
+}
+
+li .datetime {
+    font-size: small;
+    color: lightgray;
+}
+
+#session_list li {
+    padding: 4px;
+}
+
+.highlighted {
+    background-color: purple;
+}
+
+li:hover {
+    background-color: #323224;
+}
