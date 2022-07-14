@@ -1,7 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap');
 
+@font-face {
+    font-family: 'F1';
+    src: url('art/Formula1-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
-    font-family: 'Titillium Web', sans-serif;
+    font-family: 'F1', 'Titillium Web', sans-serif;
     background: url("art/bg.jpg") no-repeat center center fixed;
 
 }
@@ -74,4 +81,11 @@ li:hover {
 
 .backdrop-darken {
     backdrop-filter: brightness(20%);
+}
+
+.tyre-label {
+    font-weight: bold;
+    font-size: 48px;
+    font-family: "F1" sans-serif;
+    fill: #fff;
 }

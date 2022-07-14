@@ -11,15 +11,14 @@ function parseSessionId(sessionId) {
     }
 
     let location = sessionId.substring(0, dateIndex - 1).toUpperCase() || "Unknown location";
-    let date = sessionId.substring(dateIndex, timeIndex - 1);
+    let date = d3.timeFormat("%d %b %Y")(new Date(sessionId.substring(dateIndex, timeIndex - 1)));
     let time = sessionId.substring(timeIndex);
 
-    return `<span class="location">${location}</span><br/><span class="datetime">${date} @ ${time}</span>`;
+    return `<span class="location">${location}</span><br/><span class="datetime">${date} at ${time}</span>`;
 }
 
 function arrayEquals(a, b) {
-    return Array.isArray(a) &&
-        Array.isArray(b) &&
+    return Array.isArray(a) && Array.isArray(b) &&
         a.length === b.length &&
         a.every((val, index) => val === b[index]);
 }
