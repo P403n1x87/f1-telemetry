@@ -22,7 +22,7 @@ function setLapData(data) {
     tyreCircle.setAttribute("class", "tyre-" + compound.toLowerCase());
 
     let age = data["tyre_age"][0];
-    tyreAge.innerHTML = age + (age == 1 ? " LAP" : " LAPS");
+    tyreAge.innerHTML = age + (age == 1 ? " LAP" : " LAPS") + " OLD";
 }
 
 
@@ -113,6 +113,30 @@ function plotLapTraces(time, values) {
         }
     ]
     syncMultiTimeSeries("tstemp", time, values, tyreSurfaceTemps, syncedPlots, {});
+
+    const brakesTemps = [
+        {
+            name: "tyres_pressure_fl",
+            label: "FL",
+            color: "cyan",
+        },
+        {
+            name: "tyres_pressure_fr",
+            label: "FR",
+            color: "chartreuse",
+        },
+        {
+            name: "tyres_pressure_rl",
+            label: "RL",
+            color: "orange",
+        },
+        {
+            name: "tyres_pressure_rr",
+            label: "RR",
+            color: "pink",
+        }
+    ]
+    syncMultiTimeSeries("pressures", time, values, brakesTemps, syncedPlots, {});
 
     traceTrack(time, values, syncedPlots);
 }

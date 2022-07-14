@@ -202,8 +202,8 @@
   </script>
 </head>
 <body>
-    <div class="flex flex-col text-gray-50 h-screen">
-        <div class="flex flex-row py-2 bg-red-900 bg-opacity-20">
+    <div class="flex flex-col text-gray-50 h-screen backdrop-darken">
+        <div class="flex flex-row py-2 bg-gray-900 bg-opacity-80 backdrop-blur drop-shadow-md">
             <div id="session" class="p-1 flex flex-col">
                 <div class="p-1 text-center font-bold">SESSIONS</div>
                 <div class="p-2 max-h-48 h-48 w-48 max-w-48 overflow-y-auto">
@@ -216,11 +216,12 @@
                     <ul class="text-sm text-center" id="lap_list"/>
                 </div>
             </div>
+            <div id="laps" class="p-1 flex flex-col flex-grow"></div>
             <div class="p-1 text-center flex flex-col min-w-48 w-48">
                 <div class="p-1 text-center font-bold">TRACK</div>
                 <div class="flex flex-grow max-h-48" id="track"></div>
             </div>
-            <div class="p-1 text-center flex-col flex-grow">
+            <div class="p-1 text-center flex-col flex-grow-0">
                 <div class="p-1 text-center font-bold" id="lap-label">LAP</div>
                 <div class="flex-grow-0 flex-col">
                     <div class="flex-grow-0 text-5xl p-4 h-24" id="total-time"></div>
@@ -262,7 +263,7 @@
             <div class="flex flex-col flex-grow">
                 <div id="tstemp" class="plot"></div>
                 <div id="titemp" class="plot"></div>
-                <div id="twear" class="plot"></div>
+                <div id="pressures" class="plot"></div>
             </div>
         </div>
     </div>

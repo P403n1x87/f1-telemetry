@@ -2,7 +2,8 @@
 
 body {
     font-family: 'Titillium Web', sans-serif;
-    background-color: #100f0f;
+    background: url("art/bg.jpg") no-repeat center center fixed;
+
 }
 
 ::-webkit-scrollbar {
@@ -65,4 +66,12 @@ li .datetime {
 
 li:hover {
     background-color: #323224;
+}
+
+.backdrop-blur {
+    backdrop-filter: blur(24px);
+}
+
+.backdrop-darken {
+    backdrop-filter: brightness(20%);
 }

@@ -150,7 +150,7 @@ function syncMultiTimeSeries(container, time, values, fields, group, attributes)
             let valueLabel = labels[j];
             let field = fields[j];
             let y = values[field.name];
-            let value = arrayEquals(yDomain, [0, 1]) ? `${Math.trunc(y[i] * 100)}%` : y[i];
+            let value = arrayEquals(yDomain, [0, 1]) ? `${Math.trunc(y[i] * 100)}%` : Math.trunc(y[i] * 100) / 100;
             valueLabel
                 .text(`${field.label} ${value}`)
                 .attr("x", x[i] > (maxTime - minTime) / 2 ? - 4 : 4)
