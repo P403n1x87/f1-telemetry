@@ -28,10 +28,8 @@
     function queryLapData(session, lap, queried) {
         const queryApi = influxDB.getQueryApi(org)
 
-        const measurement = session + "-" + lap;
-        const i = session.indexOf("#");
-        const date = session.substring(i + 1, i + 11);
-
+        let [date, t, location] = session.split("|")
+        let measurement = `${session}|${lap}`
 
         var values = {}, time = []
         var minTime = -1
@@ -108,7 +106,8 @@
             `, {
             next(row, tableMeta) {
                 const fullLapName = tableMeta.toObject(row)._value
-                data.push(fullLapName.substring(fullLapName.indexOf("@") + 7))
+                let [date, time, location, lap] = fullLapName.split("|");
+                data.push(lap)
             },
             error(error) {
                 log('QUERY FAILED', error)
@@ -135,11 +134,12 @@
                         setLapData(values);
                         plotLapTraces(time, values);
                     })})
-                    .text(function(d) { return d });
+                    .append("div")
+                    .text(d => d);
 
                 // Update
                 item
-                    .text(function(d) { return d });
+                    .text(d => d);
 
                 // Exit
                 item.exit().remove();
@@ -150,7 +150,7 @@
     function updateSessions() {
         const queryApi = influxDB.getQueryApi(org)
 
-        let seenData = new Set()
+        let seenData = {}
         let data = []
         queryApi.queryRows(
             `import "influxdata/influxdb/schema"
@@ -158,17 +158,22 @@
             next(row, tableMeta) {
                 if (tableMeta.toObject(row)._value != "live") {
                     const sessionId = tableMeta.toObject(row)._value;
-                    let i = sessionId.indexOf("@") + 1;
-                    if (i == 0) {
-                        return;
-                    }
-                    let sessionPrefix = sessionId.substring(0, i + 5);
                     
-                    if (seenData.has(sessionPrefix)) {
+                    let parts = sessionId.split("|");
+                    if (parts.length != 4) {
                         return;
                     }
+
+                    let [date, time, location, lap] = parts;
+                    let sessionPrefix = `${date}|${time}|${location}`;
+                    
+                    if (seenData[sessionPrefix]) {
+                        seenData[sessionPrefix]++;
+                        return;
+                    }
+
                     data.push(sessionPrefix);
-                    seenData.add(sessionPrefix);
+                    seenData[sessionPrefix] = 1;
                 }
             },
             error(error) {
@@ -186,11 +191,12 @@
                     .append('li')
                     .attr('class', 'item')
                     .on("click", updateLaps)
-                    .html(parseSessionId);
+                    .append("div")
+                    .html(d => parseSessionId(d, seenData[d]));
 
                 // Update
                 item
-                    .html(parseSessionId);
+                    .html(d => parseSessionId(d, seenData[d]));
 
                 // Exit
                 item.exit().remove();
@@ -206,7 +212,7 @@
         <div class="flex flex-row py-2 bg-gray-900 bg-opacity-80 backdrop-blur drop-shadow-md">
             <div id="session" class="p-1 flex flex-col">
                 <div class="p-1 text-center font-bold">SESSIONS</div>
-                <div class="p-2 max-h-48 h-48 w-48 max-w-48 overflow-y-auto">
+                <div class="p-2 max-h-48 h-48 w-64 max-w-64 overflow-y-auto">
                     <ul class="text-sm" id="session_list"/>
                 </div>
             </div>

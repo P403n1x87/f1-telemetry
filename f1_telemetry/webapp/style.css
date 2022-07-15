@@ -58,7 +58,7 @@ li .location {
     font-weight: bold;
 }
 
-li .datetime {
+li .info {
     font-size: small;
     color: lightgray;
 }
@@ -71,8 +71,9 @@ li .datetime {
     background-color: purple;
 }
 
-li:hover {
-    background-color: #323224;
+li:hover>div {
+    background-color: rgba(99, 99, 99, 0.3);
+    transition: 0.2s;
 }
 
 .backdrop-blur {
