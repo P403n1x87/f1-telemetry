@@ -29,6 +29,25 @@ function setLapData(data) {
 // --------------------------------------------------------------------------------------------------------------------
 
 
+function removePlots() {
+    d3.selectAll(".plot-svg").remove();
+}
+
+function removeLaps() {
+    d3.select('#lap_list')
+        .selectAll('li')
+        .remove()
+        ;
+}
+
+function hideInfo() {
+    d3.select('#info').classed("hidden", true);
+}
+
+function showInfo() {
+    d3.select('#info').classed("hidden", false);
+}
+
 let syncedPlots = [];
 
 function plotLapTraces(time, values) {
