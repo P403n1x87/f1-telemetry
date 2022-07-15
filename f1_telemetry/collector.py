@@ -40,13 +40,18 @@ class TelemetryCollector(PacketHandler):
         self.lap = 0
         self.sector = 0
         self.sectors = [0, 0, 0]
+        self.total_time = None
         self.motion_data = None
         self.session_id = None
         self.tyre = None
         self.tyre_age = None
+        self.track = None
 
     def init_session(self):
-        self.session = self.track + "#" + datetime.now().strftime("%Y-%m-%d@%H:%M")
+        self.session = f'{datetime.now().strftime("%Y-%m-%d|%H:%M")}|{self.track}'
+        self.lap = 0
+        self.sector = 0
+        self.sectors = [0, 0, 0]
 
     def on_new_lap(self):
         self.sector = 0
@@ -56,7 +61,7 @@ class TelemetryCollector(PacketHandler):
         if self.session is None or not lap:
             return
 
-        self.sink.write(f"{self.session}-{lap:002}", fields)
+        self.sink.write(f"{self.session}|{lap:002}", fields)
 
     def push_live(self, fields):
         if self.session is None:
@@ -134,6 +139,17 @@ class TelemetryCollector(PacketHandler):
 
         self.push_live(data)
 
+    def handle_FinalClassificationData(self, packet):
+        self.emit_lap_data()
+
+    def emit_lap_data(self):
+        self.sectors[2] = self.total_time - sum(self.sectors)
+
+        lap_data = {f"sector_{i+1}_ms": t for i, t in enumerate(self.sectors)}
+        lap_data["total_time_ms"] = self.total_time
+
+        self.push(self.lap, lap_data)
+
     def handle_LapData(self, packet):
         try:
             data = packet.lap_data[_player_index(packet)]
@@ -146,10 +162,9 @@ class TelemetryCollector(PacketHandler):
                 sector_time = getattr(data, f"sector{self.sector}_time_in_ms")
                 if sector_time > 0:
                     self.sectors[self.sector - 1] = sector_time
-            # self.emit_tyre_data()
 
+        total_time = self.total_time = data.last_lap_time_in_ms
         if data.current_lap_num != self.lap:
-            total_time = data.last_lap_time_in_ms
             if all(_ > 0 for _ in self.sectors[:2]):
                 self.sectors[2] = total_time - sum(self.sectors)
                 secs, ms = divmod(total_time, 1000)
@@ -159,11 +174,8 @@ class TelemetryCollector(PacketHandler):
                     [f"{_ / 1000:.03f}" for _ in self.sectors],
                 )
 
-            lap_data = {f"sector_{i+1}_ms": t for i, t in enumerate(self.sectors)}
-            lap_data["total_time_ms"] = total_time
-
+            self.emit_lap_data()
             self.emit_tyre_data()
-            self.push(self.lap, lap_data)
 
             self.on_new_lap()
 
