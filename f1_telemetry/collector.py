@@ -53,7 +53,7 @@ class TelemetryCollector(PacketHandler):
         self.session = f'{datetime.now().strftime("%Y-%m-%d|%H:%M")}|{self.track}'
         self.lap = 0
         self.sector = 0
-        self.sectors = [0, 0, 0]
+        self.sectors[:] = [0, 0, 0]
 
     def on_new_lap(self):
         self.sector = 0
@@ -159,8 +159,6 @@ class TelemetryCollector(PacketHandler):
         self.emit_lap_data()
 
     def emit_lap_data(self):
-        self.sectors[2] = self.total_time - sum(self.sectors)
-
         lap_data = {f"sector_{i+1}_ms": t for i, t in enumerate(self.sectors)}
         lap_data["total_time_ms"] = self.total_time
 
