@@ -18,7 +18,7 @@ version = "0.0.0"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-f1-packets = "^2022.1.1"
+f1-packets = "^2022.1.2"
 influxdb-client = "^1.30.0"
 websockets = "^10.3"
 
