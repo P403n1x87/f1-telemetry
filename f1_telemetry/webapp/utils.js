@@ -1,3 +1,11 @@
+const urlParams = new URLSearchParams(window.location.search);
+
+const org = urlParams.get("org")
+const token = urlParams.get("token")
+
+let nav = d3.select('#nav');
+nav.attr('href', `${nav.attr('href')}?org=${org}&token=${token}`)
+
 function toTimestamp(date) {
     return new Date(date).getTime()
 }

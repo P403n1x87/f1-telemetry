@@ -1,10 +1,6 @@
 import { InfluxDB } from 'https://cdn.jsdelivr.net/npm/@influxdata/influxdb-client@1.27.0/dist/index.browser.mjs'
 
-const urlParams = new URLSearchParams(window.location.search);
-
-const org = urlParams.get("org")
 const url = "http://localhost:8086"
-const token = urlParams.get("token")
 
 const influxDB = new InfluxDB({ url, token })
 

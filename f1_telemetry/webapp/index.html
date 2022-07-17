@@ -7,19 +7,13 @@
   
   <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet"> 
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.0.4/d3.min.js"></script>
-  <script src="utils.js"></script>
-  <script src="plots.js"></script>
-  <script src="view.js"></script>
-  <script type="module">
-    import { getSessions } from './queries.js'
-
-    getSessions()
-  </script>
 </head>
 
 <body>
+    <div class="bg-red-600 text-center text-sm p-1 text-gray-50">
+        Go to <a id="nav" class="hover:underline font-bold" href="live.html">Live Data</a>
+    </div>
+
     <div class="flex flex-col text-gray-50 h-full flex-grow">
         <div class="flex flex-row py-2 bg-gray-900 bg-opacity-80 backdrop-blur drop-shadow-md">
             <!-- Sessions -->
@@ -109,5 +103,15 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.0.4/d3.min.js"></script>
+    <script src="utils.js"></script>
+    <script src="plots.js"></script>
+    <script src="view.js"></script>
+    <script type="module">
+      import { getSessions } from './queries.js'
+  
+      getSessions()
+    </script>
 </body>
 </html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Data</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="">
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.0.4/d3.min.js"></script>
+</head>
+<body>
+   <div class="bg-red-600 text-center text-sm p-1 text-gray-50">
+      Go to <a id="nav" class="hover:underline font-bold" href="index.html">Telemetry Data</a>
+   </div>
+   <div class="m-auto flex place-content-center py-24">
+<!-- [[[cog
+from pathlib import Path; print(Path("f1_telemetry/webapp/art/car.svg").read_text(encoding="utf-8"))
+]]] -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="car.svg"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 211.66667 127"
+   height="480"
+   width="800">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     units="px"
+     inkscape:window-maximized="1"
+     inkscape:window-y="379"
+     inkscape:window-x="-8"
+     inkscape:window-height="1417"
+     inkscape:window-width="2560"
+     showgrid="false"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:cy="196.6588"
+     inkscape:cx="323.83141"
+     inkscape:zoom="1.979899"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1"
+     transform="translate(-21.316711,-21.880417)">
+    <rect
+       style="opacity:1;fill:#000000;fill-opacity:0.5;stroke:none;stroke-width:0.567596;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect949"
+       width="211.66667"
+       height="127"
+       x="21.316711"
+       y="21.880417"
+       ry="4"
+       rx="4" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 65.05917,44.856326 c 0,0 0,0 -1.34655,0.02363 -1.42718,0.279799 -13.93788,5.457025 -13.93788,5.457025 l -0.16536,7.84301 c 0,0 5.83728,-0.97362 9.18953,-1.9135 2.11613,-1.47442 3.62588,-2.94889 3.62588,-2.94889 l 0.0709,-4.2298 c 0,0 0.388,-1.86699 2.55135,-2.267851 0.001,-0.897694 0.0122,-1.963616 0.0122,-1.963616 z"
+       id="fl-wing"
+       sodipodi:nodetypes="cccccccccc" />
+    <path
+       sodipodi:nodetypes="cccccccccc"
+       id="fr-wing"
+       d="m 67.06788,44.856326 c 0,0 0,0 1.34655,0.02363 1.42718,0.279799 13.93788,5.457025 13.93788,5.457025 l 0.16536,7.84301 c 0,0 -5.83728,-0.97362 -9.18953,-1.9135 -2.11613,-1.47442 -3.62588,-2.94889 -3.62588,-2.94889 l -0.0709,-4.2298 c 0,0 -0.388,-1.86699 -2.55135,-2.267851 -0.001,-0.897694 -0.0122,-1.963616 -0.0122,-1.963616 z"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.529167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#303030;stroke-width:0.529167;stroke-miterlimit:4;stroke-dasharray:none"
+       id="fl-tyre"
+       width="6.3783407"
+       height="11.859001"
+       x="49.04245"
+       y="59.975388"
+       ry="1.038" />
+    <rect
+       ry="1.038"
+       y="59.975388"
+       x="76.634705"
+       height="11.859001"
+       width="6.3783407"
+       id="fr-tyre"
+       style="fill:#ffffff;fill-opacity:1;stroke:#303030;stroke-width:0.529167;stroke-miterlimit:4;stroke-dasharray:none" />
+    <rect
+       ry="1.038"
+       y="118.08923"
+       x="48.220306"
+       height="12.189723"
+       width="7.5122552"
+       id="rl-tyre"
+       style="fill:#ffffff;fill-opacity:1;stroke:#303030;stroke-width:0.529167;stroke-miterlimit:4;stroke-dasharray:none" />
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#303030;stroke-width:0.529167;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rr-tyre"
+       width="7.5122552"
+       height="12.189723"
+       x="76.285034"
+       y="118.08923"
+       ry="1.038" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:7.05556px;line-height:1.25;font-family:sans-serif;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="58.737831"
+       y="43.147911"
+       id="front-wing-l"><tspan
+         sodipodi:role="line"
+         id="tspan951"
+         x="58.737831"
+         y="43.147911"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;font-family:F1;-inkscape-font-specification:F1;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583">0%</tspan></text>
+    <text
+       id="front-wing-r"
+       y="43.147911"
+       x="73.534882"
+       style="font-style:normal;font-weight:normal;font-size:7.05556px;line-height:1.25;font-family:sans-serif;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;font-family:F1;-inkscape-font-specification:F1;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
+         y="43.147911"
+         x="73.534882"
+         id="tspan955"
+         sodipodi:role="line">0%</tspan></text>
+    <text
+       id="fl-wear"
+       y="68.471489"
+       x="47.007401"
+       style="font-style:normal;font-weight:normal;font-size:7.05556px;line-height:1.25;font-family:sans-serif;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;font-family:F1;-inkscape-font-specification:F1;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
+         y="68.471489"
+         x="47.007401"
+         id="tspan959"
+         sodipodi:role="line">99%</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="47.007401"
+       y="78.4664"
+       id="fl-temp"><tspan
+         sodipodi:role="line"
+         id="tspan965"
+         x="47.007401"
+         y="78.4664"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:F1;-inkscape-font-specification:F1;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583">92</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:7.05556px;line-height:1.25;font-family:sans-serif;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="46.478233"
+       y="126.75072"
+       id="rl-wear"><tspan
+         sodipodi:role="line"
+         id="tspan977"
+         x="46.478233"
+         y="126.75072"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;font-family:F1;-inkscape-font-specification:F1;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583">99%</tspan></text>
+    <text
+       id="rl-temp"
+       y="114.57256"
+       x="47.007401"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:F1;-inkscape-font-specification:F1;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
+         y="114.57256"
+         x="47.007401"
+         id="tspan981"
+         sodipodi:role="line">92</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:7.05556px;line-height:1.25;font-family:sans-serif;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="85.531219"
+       y="68.471489"
+       id="fr-wear"><tspan
+         sodipodi:role="line"
+         id="tspan994"
+         x="85.531219"
+         y="68.471489"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;font-family:F1;-inkscape-font-specification:F1;text-align:start;text-anchor:start;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583">99%</tspan></text>
+    <text
+       id="fr-temp"
+       y="78.4664"
+       x="85.531219"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:F1;-inkscape-font-specification:F1;text-align:start;text-anchor:start;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
+         y="78.4664"
+         x="85.531219"
+         id="tspan998"
+         sodipodi:role="line">92</tspan></text>
+    <text
+       id="rr-wear"
+       y="126.75072"
+       x="86.060387"
+       style="font-style:normal;font-weight:normal;font-size:7.05556px;line-height:1.25;font-family:sans-serif;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;font-family:F1;-inkscape-font-specification:F1;text-align:start;text-anchor:start;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
+         y="126.75072"
+         x="86.060387"
+         id="tspan1002"
+         sodipodi:role="line">99%</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;text-align:end;text-anchor:end;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="85.531219"
+       y="114.57256"
+       id="rr-temp"><tspan
+         sodipodi:role="line"
+         id="tspan1006"
+         x="85.531219"
+         y="114.57256"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:F1;-inkscape-font-specification:F1;text-align:start;text-anchor:start;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583">92</tspan></text>
+    <circle
+       r="2.271791"
+       cy="76.94091"
+       cx="52.231621"
+       id="fl-tyre-temp"
+       style="fill:#6f6f6f;fill-opacity:0.33;stroke:#000000;stroke-width:0.529167;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <circle
+       style="fill:#6f6f6f;fill-opacity:0.33;stroke:#000000;stroke-width:0.529167;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="fr-tyre-temp"
+       cx="79.823875"
+       cy="76.94091"
+       r="2.271791" />
+    <circle
+       style="fill:#6f6f6f;fill-opacity:0.33;stroke:#000000;stroke-width:0.529167;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rl-tyre-temp"
+       cx="51.976433"
+       cy="113.04707"
+       r="2.271791" />
+    <circle
+       r="2.271791"
+       cy="113.04707"
+       cx="80.041161"
+       id="rr-tyre-temp"
+       style="fill:#6f6f6f;fill-opacity:0.33;stroke:#000000;stroke-width:0.529167;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       id="weather"
+       y="53.450451"
+       x="163.75417"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.7px;line-height:1.25;font-family:F1;-inkscape-font-specification:F1;text-align:center;text-anchor:middle;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       xml:space="preserve"><tspan
+         id="tspan877"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.7px;font-family:F1;-inkscape-font-specification:F1;text-align:center;text-anchor:middle;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
+         y="53.450451"
+         x="163.75417"
+         sodipodi:role="line">awaiting data ...</tspan></text>
+    <g
+       id="forecast">
+      <text
+         id="forecast1"
+         y="77.26297"
+         x="163.75417"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:F1;-inkscape-font-specification:F1;text-align:center;text-anchor:middle;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         xml:space="preserve"><tspan
+           id="tspan885"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:F1;-inkscape-font-specification:F1;text-align:center;text-anchor:middle;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
+           y="77.26297"
+           x="163.75417"
+           sodipodi:role="line">waiting for data ...</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:F1;-inkscape-font-specification:F1;text-align:center;text-anchor:middle;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         x="163.75417"
+         y="94.196304"
+         id="forecast2"><tspan
+           sodipodi:role="line"
+           x="163.75417"
+           y="94.196304"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:F1;-inkscape-font-specification:F1;text-align:center;text-anchor:middle;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
+           id="tspan889">waiting for data ...</tspan></text>
+      <text
+         id="forecast3"
+         y="111.12964"
+         x="163.75417"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:F1;-inkscape-font-specification:F1;text-align:center;text-anchor:middle;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         xml:space="preserve"><tspan
+           id="tspan893"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:F1;-inkscape-font-specification:F1;text-align:center;text-anchor:middle;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
+           y="111.12964"
+           x="163.75417"
+           sodipodi:role="line">waiting for data ...</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;line-height:1.25;font-family:F1;-inkscape-font-specification:F1;text-align:center;text-anchor:middle;fill:#e5e5e5;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         x="163.75417"
+         y="128.06297"
+         id="forecast4"><tspan
+           sodipodi:role="line"
+           x="163.75417"
+           y="128.06297"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.35px;font-family:F1;-inkscape-font-specification:F1;text-align:center;text-anchor:middle;fill:#e5e5e5;fill-opacity:1;stroke-width:0.264583"
+           id="tspan897">waiting for data ...</tspan></text>
+    </g>
+  </g>
+</svg>
+
+<!-- [[[end]]] -->
+   </div>
+
+   <script src="utils.js"></script>
+   <script src="live.js"></script>
+
+</body>
+</html>

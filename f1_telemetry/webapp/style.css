@@ -12,6 +12,11 @@ body {
     background: url("art/bg.jpg") no-repeat center center fixed;
 }
 
+html,
+body {
+    height: 100%;
+}
+
 ::-webkit-scrollbar {
     width: 0px;
     background: transparent;

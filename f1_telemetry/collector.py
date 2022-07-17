@@ -2,6 +2,7 @@ from f1.handler import PacketHandler
 from f1.packets import TYRES, TRACKS
 
 from datetime import datetime
+from f1_telemetry.live import enqueue
 
 
 def _flatten_tyre_values(data, name):
@@ -46,6 +47,7 @@ class TelemetryCollector(PacketHandler):
         self.tyre = None
         self.tyre_age = None
         self.track = None
+        self.last_live_data = {}
 
     def init_session(self):
         self.session = f'{datetime.now().strftime("%Y-%m-%d|%H:%M")}|{self.track}'
@@ -63,11 +65,16 @@ class TelemetryCollector(PacketHandler):
 
         self.sink.write(f"{self.session}|{lap:002}", fields)
 
-    def push_live(self, fields):
+    def push_live(self, _type, data):
         if self.session is None:
             return
 
-        self.sink.write("live", fields)
+        live_data = {"type": _type, "data": data}
+        if live_data == self.last_live_data.get(_type, None):
+            return
+
+        if enqueue({"type": _type, "data": data}):
+            self.last_live_data[_type] = live_data
 
     def handle_SessionData(self, packet):
         if self.session_id != packet.session_link_identifier:
@@ -75,16 +82,23 @@ class TelemetryCollector(PacketHandler):
             self.track = _track_name(packet)
             self.init_session()
 
-        # Weather data
-        data = {"weather": _weather(packet)}
-        samples = (s for s in packet.weather_forecast_samples if s.time_offset > 0)
-        for i, sample in zip(range(4), samples):
-            p = sample.rain_percentage
-            o = sample.time_offset
-            w = _weather(sample)
-            data[f"forecast_{i}"] = f"{w}\n({p}%) in {o}m" if p else w
-
-        self.push_live(data)
+        self.push_live(
+            "weather_data",
+            {
+                "weather": _weather(packet),
+                "forecasts": [
+                    (sample.time_offset, _weather(sample), sample.rain_percentage)
+                    for _, sample in zip(
+                        range(4),
+                        (
+                            s
+                            for s in packet.weather_forecast_samples
+                            if s.time_offset > 0
+                        ),
+                    )
+                ],
+            },
+        )
 
     def handle_CarTelemetryData(self, packet):
         if self.motion_data is None:
@@ -97,6 +111,8 @@ class TelemetryCollector(PacketHandler):
 
         data.update(self.motion_data)
         self.motion_data = None
+
+        self.push_live("tyre_temp", data["tyres_surface_temperature"])
 
         for k, v in dict(data).items():
             if isinstance(v, list) and len(v) == len(TYRES):
@@ -137,7 +153,7 @@ class TelemetryCollector(PacketHandler):
             if isinstance(v, list) and len(v) == len(TYRES):
                 _flatten_tyre_values(data, k)
 
-        self.push_live(data)
+        self.push_live("car_status", data)
 
     def handle_FinalClassificationData(self, packet):
         self.emit_lap_data()
