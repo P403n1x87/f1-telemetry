@@ -11,11 +11,16 @@ function setLapData(data) {
     tyreLabel.innerHTML = "";
     tyreAge.innerHTML = "";
 
-    totalTime.innerHTML = d3.timeFormat('%M:%S.%L')(new Date(0).setMilliseconds(data["total_time_ms"]));
+    let totalLapTime = data["total_time_ms"] || [0]
+    totalTime.innerHTML = d3.timeFormat('%M:%S.%L')(new Date(0).setMilliseconds(totalLapTime.at(-1)));
 
-    sector1.innerHTML = d3.timeFormat('%S.%L')(new Date(0).setMilliseconds(data["sector_1_ms"]))
-    sector2.innerHTML = d3.timeFormat('%S.%L')(new Date(0).setMilliseconds(data["sector_2_ms"]))
-    sector3.innerHTML = d3.timeFormat('%S.%L')(new Date(0).setMilliseconds(data["sector_3_ms"]))
+    let s1Time = data["sector_1_ms"] || [0]
+    let s2Time = data["sector_2_ms"] || [0]
+    let s3Time = data["sector_3_ms"] || [0]
+
+    sector1.innerHTML = d3.timeFormat('%S.%L')(new Date(0).setMilliseconds(s1Time.at(-1)))
+    sector2.innerHTML = d3.timeFormat('%S.%L')(new Date(0).setMilliseconds(s2Time.at(-1)))
+    sector3.innerHTML = d3.timeFormat('%S.%L')(new Date(0).setMilliseconds(s3Time.at(-1)))
 
     let compound = data["tyre_compound"] ? data["tyre_compound"][0] : "?";
     tyreLabel.innerHTML = compound.substring(0, 1);

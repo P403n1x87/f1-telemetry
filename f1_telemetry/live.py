@@ -4,6 +4,7 @@ import websockets
 
 LIVE_QUEUE = None
 loop = asyncio.get_event_loop()
+_CONNECTIONS = 0
 
 
 def enqueue(data):
@@ -18,9 +19,9 @@ def enqueue(data):
 
 
 async def consume_queue(websocket):
-    global LIVE_QUEUE
+    global LIVE_QUEUE, _CONNECTIONS
 
-    print("Connected")
+    _CONNECTIONS += 1
 
     if LIVE_QUEUE is None:
         LIVE_QUEUE = asyncio.Queue()
@@ -36,7 +37,11 @@ async def consume_queue(websocket):
             await websocket.send(json.dumps(data))
 
     except websockets.exceptions.ConnectionClosed:
-        print("Disconnected")
+        _CONNECTIONS -= 1
+
+        if _CONNECTIONS == 0:
+            LIVE_QUEUE = None
+            print("Queue cleared")
         return
 
 

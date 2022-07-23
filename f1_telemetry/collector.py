@@ -1,8 +1,14 @@
 from f1.handler import PacketHandler
-from f1.packets import TYRES, TRACKS
+from f1.packets import (
+    TYRES,
+    PacketCarTelemetryData,
+    PacketFinalClassificationData,
+)
 
-from datetime import datetime
+from datetime import timedelta
 from f1_telemetry.live import enqueue
+from f1_telemetry.model import Session
+import typing as t
 
 
 def _flatten_tyre_values(data, name):
@@ -27,43 +33,27 @@ def _weather(packet):
     }[packet.weather]
 
 
-def _track_name(packet):
-    return TRACKS[packet.track_id]
-
-
 class TelemetryCollector(PacketHandler):
     def __init__(self, listener, sink):
         super().__init__(listener)
 
         self.sink = sink
 
-        self.session = None
-        self.lap = 0
-        self.sector = 0
-        self.sectors = [0, 0, 0]
-        self.total_time = None
+        self.session = Session(
+            None,
+            on_lap_changed=self.on_lap_changed,
+            on_sector_changed=self.on_sector_changed,
+        )
         self.motion_data = None
-        self.session_id = None
-        self.tyre = None
-        self.tyre_age = None
-        self.track = None
+        self.tyre_data_emitted = False
+
         self.last_live_data = {}
 
-    def init_session(self):
-        self.session = f'{datetime.now().strftime("%Y-%m-%d|%H:%M")}|{self.track}'
-        self.lap = 0
-        self.sector = 0
-        self.sectors[:] = [0, 0, 0]
-
-    def on_new_lap(self):
-        self.sector = 0
-        self.sectors[:] = [0, 0, 0]
-
-    def push(self, lap, fields):
-        if self.session is None or not lap:
+    def push(self, fields):
+        if self.session is None or self.session.lap == 0:
             return
 
-        self.sink.write(f"{self.session}|{lap:002}", fields)
+        self.sink.write(f"{self.session.slug}|{self.session.lap:002}", fields)
 
     def push_live(self, _type, data):
         if self.session is None:
@@ -76,11 +66,43 @@ class TelemetryCollector(PacketHandler):
         if enqueue({"type": _type, "data": data}):
             self.last_live_data[_type] = live_data
 
+    def on_sector_changed(self, n, time, best):
+        self.push({f"sector_{n}_ms": time})
+
+        best_time = sum(self.session.best_sectors[1 : n + 1])
+        current_time = sum(self.session.sectors[1 : n + 1])
+
+        if best:
+            bg = "105"
+        elif current_time < best_time:
+            bg = "102"
+        else:
+            bg = "103"
+
+        if time > 0:
+            print(
+                f"\033[30;{bg}m" + f"{time/1000:02.3f}".center(10) + "\033[0m",
+                end="",
+                flush=True,
+            )
+
+    def on_lap_changed(self, lap: t.Optional[int], last_lap_time, best):
+        if last_lap_time != 0:
+            self.push({"total_time_ms": last_lap_time})
+
+            time = str(timedelta(milliseconds=last_lap_time))[2:-3].center(13)
+            if best:
+                print(f"\033[95m" + f"{time}".center(10) + "\033[0m", end="")
+            else:
+                print(time, end="")
+
+        if lap is not None:
+            print(f"\nLap {lap:<6}", end="", flush=True)
+
+        self.tyre_data_emitted = False
+
     def handle_SessionData(self, packet):
-        if self.session_id != packet.session_link_identifier:
-            self.session_id = packet.session_link_identifier
-            self.track = _track_name(packet)
-            self.init_session()
+        self.session.refresh(packet)
 
         self.push_live(
             "weather_data",
@@ -100,7 +122,7 @@ class TelemetryCollector(PacketHandler):
             },
         )
 
-    def handle_CarTelemetryData(self, packet):
+    def handle_CarTelemetryData(self, packet: PacketCarTelemetryData):
         if self.motion_data is None:
             return
 
@@ -112,36 +134,32 @@ class TelemetryCollector(PacketHandler):
         data.update(self.motion_data)
         self.motion_data = None
 
-        self.push_live("tyre_temp", data["tyres_surface_temperature"])
+        self.push_live("tyre_temp", data["tyres_inner_temperature"])
 
         for k, v in dict(data).items():
             if isinstance(v, list) and len(v) == len(TYRES):
                 _flatten_tyre_values(data, k)
 
-        self.push(self.lap, data)
+        self.push(data)
 
     def handle_CarStatusData(self, packet):
         try:
-            data = packet.car_status_data[_player_index(packet)].to_dict()
+            data = packet.car_status_data[_player_index(packet)]
         except IndexError:
             return
 
-        self.tyre = {16: "Soft", 17: "Medium", 18: "Hard", 7: "Inter", 8: "Wet"}[
-            data["visual_tyre_compound"]
-        ]
-        self.tyre_age = data["tyres_age_laps"]
+        self.session.car_status_data(data)
 
-    def emit_tyre_data(self):
-        if self.tyre is None:
-            return
+        if not self.tyre_data_emitted:
+            self.push(
+                {
+                    "tyre_compound": self.session.tyre,
+                    "tyre_age": self.session.tyre_age,
+                },
+            )
+            self.tyre_data_emitted = True
 
-        self.push(
-            self.lap,
-            {
-                "tyre_compound": self.tyre,
-                "tyre_age": self.tyre_age,
-            },
-        )
+        self.push_live("fuel", data.fuel_remaining_laps)
 
     def handle_CarDamageData(self, packet):
         try:
@@ -155,14 +173,8 @@ class TelemetryCollector(PacketHandler):
 
         self.push_live("car_status", data)
 
-    def handle_FinalClassificationData(self, packet):
-        self.emit_lap_data()
-
-    def emit_lap_data(self):
-        lap_data = {f"sector_{i+1}_ms": t for i, t in enumerate(self.sectors)}
-        lap_data["total_time_ms"] = self.total_time
-
-        self.push(self.lap, lap_data)
+    def handle_FinalClassificationData(self, packet: PacketFinalClassificationData):
+        self.session.final_classification()
 
     def handle_LapData(self, packet):
         try:
@@ -170,30 +182,7 @@ class TelemetryCollector(PacketHandler):
         except IndexError:
             return
 
-        if data.sector != self.sector:
-            self.sector = data.sector
-            if self.sector > 0:
-                sector_time = getattr(data, f"sector{self.sector}_time_in_ms")
-                if sector_time > 0:
-                    self.sectors[self.sector - 1] = sector_time
-
-        total_time = self.total_time = data.last_lap_time_in_ms
-        if data.current_lap_num != self.lap:
-            if all(_ > 0 for _ in self.sectors[:2]):
-                self.sectors[2] = total_time - sum(self.sectors)
-                secs, ms = divmod(total_time, 1000)
-                mins, secs = divmod(secs, 60)
-                print(
-                    f"Lap {self.lap}: {mins}:{secs:02}.{ms:03}",
-                    [f"{_ / 1000:.03f}" for _ in self.sectors],
-                )
-
-            self.emit_lap_data()
-            self.emit_tyre_data()
-
-            self.on_new_lap()
-
-        self.lap = data.current_lap_num
+        self.session.lap_data(data)
 
     def handle_MotionData(self, packet):
         try:

@@ -85,6 +85,13 @@ function updateWeather(data) {
     forecastGroup.exit().remove();
 }
 
+function updateFuel(data) {
+    let fuelField = d3.select("#fuel").select("tspan")
+
+    fuelField.text(`${data.toFixed(2)}`);
+    fuelField.style("fill", data > 0 ? "lime" : "red");
+}
+
 let socket = new WebSocket("ws://localhost:20775");
 
 socket.onopen = event => {
@@ -106,6 +113,10 @@ socket.onmessage = event => {
 
         case "weather_data":
             updateWeather(message.data);
+            break;
+
+        case "fuel":
+            updateFuel(message.data);
             break;
 
         default:
@@ -137,7 +148,9 @@ testData = {
     tyres_wear_rr: 0,
 };
 
+
 updateFrontWing(testData);
 updateTyreWear(testData);
 updateTyreTemp([60, 60, 60, 60]);
 updateWeather({ weather: "waiting for data ...", forecasts: [] })
+updateFuel(0);
