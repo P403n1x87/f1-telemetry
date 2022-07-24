@@ -20,6 +20,7 @@ class Session:
         self.tyre_age = None
         self.current_time = 0
         self.track = TRACKS[packet.track_id] if packet else None
+        self.on_track = False
         self.slug = f'{datetime.now().strftime("%Y-%m-%d|%H:%M")}|{self.track}'
 
     def refresh(self, packet: PacketSessionData):
@@ -54,6 +55,10 @@ class Session:
             self.on_lap_changed(next_lap, last_lap_time, best)
 
     def lap_data(self, data: LapData):
+        self.on_track = data.driver_status in (1, 4)
+        if not self.on_track:
+            return
+
         self.current_time = data.current_lap_time_in_ms
         current_lap = data.current_lap_num
         current_sector = data.sector + 1
