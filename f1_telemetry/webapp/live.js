@@ -26,7 +26,8 @@ const frTyreTemp = d3.select("#fr-tyre-temp");
 const rlTyreTemp = d3.select("#rl-tyre-temp");
 const rrTyreTemp = d3.select("#rr-tyre-temp");
 
-const weather = d3.select("#weather").select("tspan");
+const weatherIcon = d3.select("#weather-icon");
+const weatherCond = d3.select("#weather-cond");
 
 const fuelField = d3.select("#fuel").select("tspan");
 
@@ -107,17 +108,17 @@ function updateTyreTemp(data) {
 }
 
 function updateWeather(data) {
-    weather.text(data.weather);
+    weatherIcon.text(data.weather[0]);
+    weatherCond.text(data.weather[1]);
 
-    let forecastGroup = d3.select("#forecast").selectAll("text")
-    forecastGroup
-        .data(data.forecasts)
-        .enter()
-        .append("text")
-        .merge(forecastGroup)
-        .text(d => `${d[0]}m ${d[1]} (${d[2]}%)`)
-
-    forecastGroup.exit().remove();
+    for (let i in data.forecasts) {
+        const forecast = data.forecasts[i];
+        j = parseInt(i) + 1;
+        d3.select(`#forecast${j}-icon`).text(forecast[1]);
+        d3.select(`#forecast${j}-cond`).text(forecast[2]);
+        d3.select(`#forecast${j}-offset`).text(`+${forecast[0]}m`);
+        d3.select(`#forecast${j}-pp`).text(`${forecast[3]}%`);
+    }
 }
 
 function updateFuel(data) {
@@ -184,8 +185,15 @@ initData = {
     tyres_wear_rr: 0,
 };
 
+initForecast = [
+    [5, "☀️", "Clear", 0],
+    [10, "☀️", "Clear", 0],
+    [15, "☀️", "Clear", 0],
+    [30, "☀️", "Clear", 0]
+]
+
 updateFrontWing(initData);
 updateTyreWear(initData);
 updateTyreTemp([60, 60, 60, 60]);
-updateWeather({ weather: "waiting for data ...", forecasts: [[5, "waiting...", 10]] })
+updateWeather({ weather: ["☀️", "Clear"], forecasts: initForecast })
 updateFuel(0);

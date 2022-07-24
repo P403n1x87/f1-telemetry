@@ -23,13 +23,20 @@ class Session:
         self.on_track = False
         self.slug = f'{datetime.now().strftime("%Y-%m-%d|%H:%M")}|{self.track}'
 
-    def refresh(self, packet: PacketSessionData):
+    def refresh(self, packet: PacketSessionData) -> bool:
+        """Refresh the current session.
+
+        If the session has changed, return True.
+        """
         if self.link != packet.session_link_identifier:
             self.__init__(
                 packet,
                 on_lap_changed=self.on_lap_changed,
                 on_sector_changed=self.on_sector_changed,
             )
+            return True
+
+        return False
 
     def _close_lap(self, total_time, next_lap):
         if self.sector == 3:

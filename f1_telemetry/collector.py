@@ -24,12 +24,12 @@ def _player_index(packet):
 
 def _weather(packet):
     return {
-        0: "☀️ Clear",
-        1: "🌥️ Light cloud",
-        2: "☁️ Overcast",
-        3: "🌦️ Light rain",
-        4: "🌧️ Heavy rain",
-        5: "⛈️ Storm",
+        0: ("☀️", "Clear"),
+        1: ("🌥️", "Light cloud"),
+        2: ("☁️", "Overcast"),
+        3: ("🌦️", "Light rain"),
+        4: ("🌧️", "Heavy rain"),
+        5: ("⛈️", "Storm"),
     }[packet.weather]
 
 
@@ -102,20 +102,22 @@ class TelemetryCollector(PacketHandler):
         self.tyre_data_emitted = False
 
     def handle_SessionData(self, packet):
-        self.session.refresh(packet)
+        if self.session.refresh(packet):
+            print(f"New session {self.session.slug}")
 
         self.push_live(
             "weather_data",
             {
                 "weather": _weather(packet),
                 "forecasts": [
-                    (sample.time_offset, _weather(sample), sample.rain_percentage)
+                    (sample.time_offset, *_weather(sample), sample.rain_percentage)
                     for _, sample in zip(
                         range(4),
                         (
                             s
                             for s in packet.weather_forecast_samples
                             if s.time_offset > 0
+                            and s.session_type == packet.session_type
                         ),
                     )
                 ],
