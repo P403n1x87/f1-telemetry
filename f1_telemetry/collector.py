@@ -3,12 +3,14 @@ from f1.packets import (
     TYRES,
     PacketCarTelemetryData,
     PacketFinalClassificationData,
+    Packet,
+    PacketSessionData,
 )
 
-from datetime import timedelta
 from f1_telemetry.live import enqueue
-from f1_telemetry.model import Session
+from f1_telemetry.model import Session, SessionEventHandler
 import typing as t
+from f1_telemetry.view import SessionPrinter
 
 
 def _flatten_tyre_values(data, name):
@@ -18,11 +20,11 @@ def _flatten_tyre_values(data, name):
     )
 
 
-def _player_index(packet):
+def _player_index(packet: Packet) -> int:
     return packet.header.player_car_index
 
 
-def _weather(packet):
+def _weather(packet: PacketSessionData) -> t.Tuple[str, str]:
     return {
         0: ("☀️", "Clear"),
         1: ("🌥️", "Light cloud"),
@@ -33,29 +35,26 @@ def _weather(packet):
     }[packet.weather]
 
 
-class TelemetryCollector(PacketHandler):
+class TelemetryCollector(PacketHandler, SessionEventHandler):
     def __init__(self, listener, sink):
         super().__init__(listener)
 
         self.sink = sink
 
-        self.session = Session(
-            None,
-            on_lap_changed=self.on_lap_changed,
-            on_sector_changed=self.on_sector_changed,
-        )
+        self.session = Session(self)
         self.motion_data = None
         self.tyre_data_emitted = False
 
         self.last_live_data = {}
+        self.printer = SessionPrinter()
 
-    def push(self, fields):
+    def push(self, fields: t.Dict[str, t.Any]):
         if self.session is None or self.session.lap == 0:
             return
 
         self.sink.write(f"{self.session.slug}|{self.session.lap:002}", fields)
 
-    def push_live(self, _type, data):
+    def push_live(self, _type: str, data: t.Dict[str, t.Any]):
         if self.session is None:
             return
 
@@ -66,44 +65,42 @@ class TelemetryCollector(PacketHandler):
         if enqueue({"type": _type, "data": data}):
             self.last_live_data[_type] = live_data
 
-    def on_sector_changed(self, n, time, best):
-        self.push({f"sector_{n}_ms": time})
+    def collect(self):
+        return self.handle()
 
-        best_time = sum(self.session.best_sectors[1 : n + 1])
+    # ---- SessionEventHandler ----
+
+    def on_sector(self, n: int, lap: int, time: float, best: bool) -> None:
+        self.push({f"sector_{n}_ms": time})
+        if time <= 0:
+            return
+
+        best_time = sum(self.session.best_lap_sectors[1 : n + 1])
         current_time = sum(self.session.sectors[1 : n + 1])
 
-        if best:
-            bg = "105"
-        elif current_time < best_time:
-            bg = "102"
-        else:
-            bg = "103"
+        self.printer.print_sector(
+            n, lap, time, best, best_time == 0 or current_time < best_time
+        )
 
-        if time > 0:
-            print(
-                f"\033[30;{bg}m" + f"{time/1000:02.3f}".center(10) + "\033[0m",
-                end="",
-                flush=True,
-            )
-
-    def on_lap_changed(self, lap: t.Optional[int], last_lap_time, best):
-        if last_lap_time != 0:
+    def on_new_lap(self, current_lap, previous_lap, previous_sectors, best):
+        last_lap_time = sum(previous_sectors)
+        if last_lap_time > 0:
             self.push({"total_time_ms": last_lap_time})
-
-            time = str(timedelta(milliseconds=last_lap_time))[2:-3].center(13)
-            if best:
-                print(f"\033[95m" + f"{time}".center(10) + "\033[0m", end="")
-            else:
-                print(time, end="")
-
-        if lap is not None:
-            print(f"\nLap {lap:<6}", end="", flush=True)
+            self.printer.print_lap_time(previous_lap, last_lap_time, best)
 
         self.tyre_data_emitted = False
 
+    def on_finish(self, lap, sectors, best):
+        self.on_new_lap(None, lap, sectors, best)
+        print("🏁")
+
+    def on_new_session(self, session):
+        self.printer.print_session(session.slug)
+
+    # ---- PacketHandler ----
+
     def handle_SessionData(self, packet):
-        if self.session.refresh(packet):
-            print(f"New session {self.session.slug}")
+        self.session.refresh(packet)
 
         self.push_live(
             "weather_data",
@@ -191,6 +188,3 @@ class TelemetryCollector(PacketHandler):
             self.motion_data = packet.car_motion_data[_player_index(packet)].to_dict()
         except IndexError:
             return
-
-    def collect(self):
-        return self.handle()

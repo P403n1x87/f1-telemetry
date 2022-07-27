@@ -1,97 +1,182 @@
+from abc import ABC, abstractmethod
 from datetime import datetime
+from enum import Enum
 from f1.packets import PacketSessionData, TRACKS, LapData, CarStatusData
+import typing as t
+
+
+class SessionState(Enum):
+    INIT = 0
+    OFF_TRACK = 1
+    ON_TRACK = 2
+    FINISHED = 3
+
+
+class SessionEventHandler(ABC):
+    @abstractmethod
+    def on_new_session(self, session: "Session") -> None:
+        ...
+
+    @abstractmethod
+    def on_new_lap(
+        self,
+        current_lap: int,
+        previous_lap: int,
+        previous_sectors: t.Tuple[int, int, int],
+        best: bool,
+    ) -> None:
+        ...
+
+    @abstractmethod
+    def on_sector(self, n: int, lap: int, time: float, best: bool) -> None:
+        ...
+
+    @abstractmethod
+    def on_finish(self, lap: int, sectors: t.Tuple[int, int, int], best: bool) -> None:
+        ...
 
 
 class Session:
-    def __init__(self, packet=None, on_lap_changed=None, on_sector_changed=None):
-        self.on_sector_changed = on_sector_changed
-        self.on_lap_changed = on_lap_changed
+    def __init__(self, handler: SessionEventHandler) -> None:
+        self.handler = handler
 
-        self.link = packet.session_link_identifier if packet else None
+        self.state = SessionState.INIT
 
         self.lap = 0
-        self.best_lap_time = 0
-        self.sector = 1
+        self.sector = 0
         self.sectors = [None, 0, 0, 0]
+        self.best_lap_time = 0
         self.best_sectors = [None, 0, 0, 0]
-        self.motion_data = None
-        self.session_id = None
+        self.best_lap_sectors = [None, 0, 0, 0]
         self.tyre = None
         self.tyre_age = None
-        self.current_time = 0
-        self.track = TRACKS[packet.track_id] if packet else None
-        self.on_track = False
-        self.slug = f'{datetime.now().strftime("%Y-%m-%d|%H:%M")}|{self.track}'
+        self.slug = None
+        self.link = None
+        self.track = None
 
-    def refresh(self, packet: PacketSessionData) -> bool:
-        """Refresh the current session.
+        self._lap_data = None
 
-        If the session has changed, return True.
-        """
-        if self.link != packet.session_link_identifier:
-            self.__init__(
-                packet,
-                on_lap_changed=self.on_lap_changed,
-                on_sector_changed=self.on_sector_changed,
-            )
-            return True
+    def step(self):
+        self.state = getattr(self, f"handle_{self.state.name}")()
 
-        return False
+    def handle_INIT(self):
+        if self._lap_data is None:
+            return SessionState.INIT
 
-    def _close_lap(self, total_time, next_lap):
-        if self.sector == 3:
-            sector_time = self.sectors[3] = total_time - sum(self.sectors[1:3])
-            if sector_time == total_time:
-                sector_time = 0
-            best = (
-                self.best_sectors[self.sector] == 0
-                or self.best_sectors[self.sector] > sector_time
-            )
-            if best:
-                self.best_sectors[self.sector] = sector_time
+        return (
+            SessionState.ON_TRACK
+            if self._lap_data.driver_status in (1, 4)
+            else SessionState.OFF_TRACK
+        )
 
-            if self.on_sector_changed:
-                self.on_sector_changed(3, sector_time, best)
-
-        last_lap_time = sum(self.sectors[1:])
-        best = self.best_lap_time == 0 or self.best_lap_time > last_lap_time
+    def _update_sector_3(self):
+        total_time = self._lap_data.last_lap_time_in_ms
+        sector_time = self.sectors[3] = (
+            0
+            if any(_ == 0 for _ in self.sectors[1:3])
+            else total_time - sum(self.sectors[1:3])
+        )
+        best = self.best_sectors[3] == 0 or self.best_sectors[3] > sector_time
         if best:
-            self.best_lap_time = last_lap_time
+            self.best_sectors[3] = sector_time
 
-        if self.on_lap_changed:
-            self.on_lap_changed(next_lap, last_lap_time, best)
+        return best
 
-    def lap_data(self, data: LapData):
-        self.on_track = data.driver_status in (1, 4)
-        if not self.on_track:
+    def _update_last_lap(self) -> bool:
+        total_time = self._lap_data.last_lap_time_in_ms
+        best = self.best_lap_time == 0 or self.best_lap_time > total_time
+        if best:
+            self.best_lap_time = total_time
+            self.best_lap_sectors = tuple(self.sectors)
+        return best
+
+    def handle_OFF_TRACK(self):
+        if self._lap_data is None:
+            return SessionState.INIT
+
+        self.lap = self._lap_data.current_lap_num
+        self.sector = self._lap_data.sector + 1
+
+        return (
+            SessionState.ON_TRACK
+            if self._lap_data.driver_status in (1, 4)
+            else SessionState.OFF_TRACK
+        )
+
+    def handle_ON_TRACK(self):
+        if self._lap_data is None:
+            return SessionState.INIT
+
+        try:
+            current_lap = self._lap_data.current_lap_num
+            current_sector = self._lap_data.sector + 1
+
+            if self._lap_data.driver_status not in (1, 4):
+                return SessionState.OFF_TRACK
+
+            if (self.lap, self.sector) < (current_lap, current_sector):
+                # Flashback
+                pass
+
+            if self.lap < current_lap:  # new lap
+                best = self._update_sector_3()
+
+                self.handler.on_sector(3, self.lap, self.sectors[3], best)
+
+                best = self._update_last_lap()
+
+                self.handler.on_new_lap(
+                    current_lap, self.lap, tuple(self.sectors[1:]), best
+                )
+
+            elif self.sector < current_sector:  # new sector
+                sector_time = getattr(self._lap_data, f"sector{self.sector}_time_in_ms")
+                self.sectors[self.sector] = sector_time
+                best = (
+                    self.best_sectors[self.sector] == 0
+                    or self.best_sectors[self.sector] > sector_time
+                )
+                if best:
+                    self.best_sectors[self.sector] = sector_time
+
+                self.handler.on_sector(self.sector, self.lap, sector_time, best)
+
+            return SessionState.ON_TRACK
+
+        finally:
+            self.lap = current_lap
+            self.sector = current_sector
+
+    def handle_FINISHED(self):
+        best = self._update_sector_3()
+        self.handler.on_sector(3, self.lap, self.sectors[3], best)
+
+        best = self._update_last_lap()
+        self.handler.on_finish(self.lap, tuple(self.sectors[1:]), best)
+
+        self.link = None
+
+        return SessionState.INIT
+
+    def refresh(self, packet: PacketSessionData):
+        """Refresh the current session."""
+        if self.link == packet.session_link_identifier:
             return
 
-        self.current_time = data.current_lap_time_in_ms
-        current_lap = data.current_lap_num
-        current_sector = data.sector + 1
-        if current_lap > self.lap or self.sector > current_sector:
-            self.sector = 3
+        self.__init__(self.handler)
 
-            self._close_lap(data.last_lap_time_in_ms, current_lap)
+        self.link = packet.session_link_identifier
+        self.track = TRACKS[packet.track_id]
+        self.slug = f'{datetime.now().strftime("%Y-%m-%d|%H:%M")}|{self.track}'
 
-            self.sector = current_sector
-            self.sectors[:] = [None, 0, 0, 0]
-            self.lap = current_lap
+        self.handler.on_new_session(self)
 
-        elif self.sector < current_sector:
-            sector_time = getattr(data, f"sector{self.sector}_time_in_ms")
-            self.sectors[self.sector] = sector_time
-            best = (
-                self.best_sectors[self.sector] == 0
-                or self.best_sectors[self.sector] > sector_time
-            )
-            if best:
-                self.best_sectors[self.sector] = sector_time
+        self.step()
 
-            if self.on_sector_changed:
-                self.on_sector_changed(self.sector, sector_time, best)
+    def lap_data(self, data: LapData):
+        self._lap_data = data
 
-            self.sector = current_sector
+        self.step()
 
     def car_status_data(self, data: CarStatusData):
         self.tyre = {16: "Soft", 17: "Medium", 18: "Hard", 7: "Inter", 8: "Wet"}[
@@ -100,4 +185,6 @@ class Session:
         self.tyre_age = data.tyres_age_laps
 
     def final_classification(self):
-        self._close_lap(self.current_time, None)
+        self.state = SessionState.FINISHED
+
+        self.step()
