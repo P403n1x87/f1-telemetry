@@ -7,7 +7,7 @@ import typing as t
 
 class SessionState(Enum):
     INIT = 0
-    OFF_TRACK = 1
+    IN_GARAGE = 1
     ON_TRACK = 2
     FINISHED = 3
 
@@ -51,8 +51,9 @@ class Session:
         self.tyre = None
         self.tyre_age = None
         self.slug = None
-        self.link = None
+        self.session_uid = None
         self.track = None
+        self.type = None
 
         self._lap_data = None
 
@@ -66,7 +67,7 @@ class Session:
         return (
             SessionState.ON_TRACK
             if self._lap_data.driver_status in (1, 4)
-            else SessionState.OFF_TRACK
+            else SessionState.IN_GARAGE
         )
 
     def _update_sector_3(self):
@@ -90,7 +91,7 @@ class Session:
             self.best_lap_sectors = tuple(self.sectors)
         return best
 
-    def handle_OFF_TRACK(self):
+    def handle_IN_GARAGE(self):
         if self._lap_data is None:
             return SessionState.INIT
 
@@ -99,8 +100,8 @@ class Session:
 
         return (
             SessionState.ON_TRACK
-            if self._lap_data.driver_status in (1, 4)
-            else SessionState.OFF_TRACK
+            if self._lap_data.driver_status != 0
+            else SessionState.IN_GARAGE
         )
 
     def handle_ON_TRACK(self):
@@ -111,8 +112,8 @@ class Session:
             current_lap = self._lap_data.current_lap_num
             current_sector = self._lap_data.sector + 1
 
-            if self._lap_data.driver_status not in (1, 4):
-                return SessionState.OFF_TRACK
+            if self._lap_data.driver_status == 0:
+                return SessionState.IN_GARAGE
 
             if (self.lap, self.sector) < (current_lap, current_sector):
                 # Flashback
@@ -154,20 +155,21 @@ class Session:
         best = self._update_last_lap()
         self.handler.on_finish(self.lap, tuple(self.sectors[1:]), best)
 
-        self.link = None
+        self.session_uid = None
 
         return SessionState.INIT
 
     def refresh(self, packet: PacketSessionData):
         """Refresh the current session."""
-        if self.link == packet.session_link_identifier:
+        if self.session_uid == packet.header.session_uid:
             return
 
         self.__init__(self.handler)
 
-        self.link = packet.session_link_identifier
+        self.session_uid = packet.header.session_uid
         self.track = TRACKS[packet.track_id]
         self.slug = f'{datetime.now().strftime("%Y-%m-%d|%H:%M")}|{self.track}'
+        self.type = packet.session_type
 
         self.handler.on_new_session(self)
 

@@ -73,3 +73,12 @@ class SessionPrinter:
             print(time, end="", flush=True)
 
         self.lap_ended = True
+
+    def print_tyre(self, tyre: str, tyre_age: int) -> None:
+        t = tyre[0]
+        color = {"S": "31", "M": "33", "H": "37", "I": "32", "W": 34}[t]
+        print(
+            f"\033[30;{color}m(\033[0m" + t + f"\033[30;{color}m)\033[0m  {tyre_age}",
+            end="",
+            flush=True,
+        )

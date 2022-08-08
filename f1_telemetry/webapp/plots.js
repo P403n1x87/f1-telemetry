@@ -29,16 +29,18 @@ function syncMultiTimeSeries(container, time, values, fields, group, attributes)
     feMerge.append("feMergeNode")
         .attr("in", "SourceGraphic");
 
-    // Process the X data and create the scale
-    const minTime = d3.min(time);
-    const maxTime = d3.max(time);
-    let x = time;
+    let x = values["distance"];
+    let rivalX = values["rival_distance"] || x;
 
-    const xDomain = d3.extent(x)
+    // Process the X data and create the scale
+    const minX = d3.min([d3.min(x), d3.min(rivalX)]);
+    const maxX = d3.max([d3.max(x), d3.max(rivalX)]);
+
+    const xDomain = [minX, maxX];
     const xScale = d3.scaleLinear(xDomain, [0, width]);
     const xAxisGen = d3.axisBottom(xScale)
         .ticks(10)
-        .tickFormat(d => d == 0 ? "" : d3.timeFormat('%M:%S')(new Date(0).setSeconds(d)))
+        // .tickFormat(d => d)
         ;
     const xAxis = svg.append("g")
         .attr("transform", `translate(0, ${height})`)
@@ -88,18 +90,21 @@ function syncMultiTimeSeries(container, time, values, fields, group, attributes)
     for (let i in fields) {
         const field = fields[i];
         // Add the plot
+        let rival = field.name.startsWith("rival");
         var plot = svg.append("path")
             .datum(values[field.name])
             .classed("sync-plot", true)
             .style("filter", "url(#glow)")
             .attr("fill", "none")
             .attr("stroke", field.color)
-            .attr("stroke-width", 1.5)
+            .attr("stroke-width", field.width || 1.5)
             .attr("d", d3.line()
-                .x((_, i) => xScale(x[i]))
+                .x((_, i) => xScale(rival ? rivalX[i] : x[i]))
                 .y(d => yScale(d))
             )
             ;
+
+        plot.rival = rival;
 
         plots.push(plot);
     }
@@ -148,12 +153,15 @@ function syncMultiTimeSeries(container, time, values, fields, group, attributes)
         for (let j in labels) {
             let valueLabel = labels[j];
             let field = fields[j];
+            if (field.name.startsWith("rival")) {
+                i = d3.bisectCenter(rivalX, x[i]);
+            }
             let y = values[field.name];
             let value = arrayEquals(yDomain, [0, 1]) ? `${Math.trunc(y[i] * 100)}%` : Math.trunc(y[i] * 100) / 100;
             valueLabel
                 .text(`${field.label} ${value}`)
-                .attr("x", x[i] > (maxTime - minTime) / 2 ? - 4 : 4)
-                .attr("text-anchor", x[i] > (maxTime - minTime) / 2 ? "end" : "start")
+                .attr("x", x[i] > (maxX - minX) / 2 ? - 4 : 4)
+                .attr("text-anchor", x[i] > (maxX - minX) / 2 ? "end" : "start")
                 .attr("transform", `translate(0,${labelScale(y[i])})`)
                 .attr("font-family", "F1")
                 .attr("font-size", 12)
@@ -181,7 +189,7 @@ function syncMultiTimeSeries(container, time, values, fields, group, attributes)
             plot = plots[i];
             plot.transition().duration(1000)
                 .attr("d", d3.line()
-                    .x((_, i) => xScale(x[i]))
+                    .x((_, i) => xScale(plot.rival ? rivalX[i] : x[i]))
                     .y(d => yScale(d))
                 );
         }
@@ -233,7 +241,7 @@ function traceTrack(time, data, group) {
         .style("filter", "url(#track-glow)")
         .attr("fill", "none")
         .attr("stroke", "#f0f0f0")
-        .attr("stroke-width", 16)
+        .attr("stroke-width", 24)
         .attr("d", d3.line()
             .x((_, i) => x[i])
             .y((_, i) => y[i])
@@ -241,7 +249,7 @@ function traceTrack(time, data, group) {
 
     // Add the position bullet
     const point = svg.append("circle")
-        .attr("r", 24)
+        .attr("r", 32)
         .style("filter", "url(#track-glow)")
         .style("display", "none")
         .attr("fill", "white")

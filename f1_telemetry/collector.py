@@ -5,12 +5,27 @@ from f1.packets import (
     PacketFinalClassificationData,
     Packet,
     PacketSessionData,
+    PacketLapData,
 )
+from bisect import bisect_left
 
 from f1_telemetry.live import enqueue
 from f1_telemetry.model import Session, SessionEventHandler
 import typing as t
 from f1_telemetry.view import SessionPrinter
+
+
+def closest(values, value):
+    pos = bisect_left(values, value)
+    if pos == 0:
+        return pos
+    if pos == len(values):
+        return pos - 1
+    before = values[pos - 1]
+    after = values[pos]
+    if after - value < value - before:
+        return pos
+    return pos - 1
 
 
 def _flatten_tyre_values(data, name):
@@ -47,6 +62,13 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
 
         self.last_live_data = {}
         self.printer = SessionPrinter()
+
+        self.gap = 0  # meters
+        self.leader_distance = []
+        self.leader_time = []
+        self.rival_index = 255
+        self.distance = 0
+        self.rival_distance = 0
 
     def push(self, fields: t.Dict[str, t.Any]):
         if self.session is None or self.session.lap == 0:
@@ -87,8 +109,15 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         if last_lap_time > 0:
             self.push({"total_time_ms": last_lap_time})
             self.printer.print_lap_time(previous_lap, last_lap_time, best)
+            if self.tyre_data_emitted:
+                self.printer.print_tyre(self.session.tyre, self.session.tyre_age)
+
+        if current_lap:
+            self.printer.print_lap(current_lap)
 
         self.tyre_data_emitted = False
+        self.leader_distance.clear()
+        self.leader_time.clear()
 
     def on_finish(self, lap, sectors, best):
         self.on_new_lap(None, lap, sectors, best)
@@ -133,6 +162,17 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         data.update(self.motion_data)
         self.motion_data = None
 
+        data["distance"] = self.distance
+        if self.session.type == 13:
+            data["gap"] = self.gap
+            if self.rival_index != 255:
+                rival = packet.car_telemetry_data[self.rival_index]
+                data["rival_throttle"] = rival.throttle
+                data["rival_brake"] = rival.brake
+                data["rival_gear"] = rival.gear
+                data["rival_speed"] = rival.speed
+                data["rival_distance"] = self.rival_distance
+
         self.push_live("tyre_temp", data["tyres_inner_temperature"])
 
         for k, v in dict(data).items():
@@ -175,9 +215,27 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
     def handle_FinalClassificationData(self, packet: PacketFinalClassificationData):
         self.session.final_classification()
 
-    def handle_LapData(self, packet):
+    def handle_LapData(self, packet: PacketLapData):
         try:
             data = packet.lap_data[_player_index(packet)]
+            self.rival_index = rival_index = packet.time_trial_rival_car_idx
+            if rival_index != 255:
+                rival = packet.lap_data[rival_index]
+                gap = rival.lap_distance - data.lap_distance
+                if gap >= 0:
+                    self.leader_distance.append(rival.lap_distance)
+                    self.leader_time.append(rival.current_lap_time_in_ms)
+                    i = closest(self.leader_distance, data.lap_distance)
+                    self.gap = data.current_lap_time_in_ms - self.leader_time[i]
+                else:
+                    self.leader_distance.append(data.lap_distance)
+                    self.leader_time.append(data.current_lap_time_in_ms)
+                    i = closest(self.leader_distance, rival.lap_distance)
+                    self.gap = self.leader_time[i] - rival.current_lap_time_in_ms
+                self.gap /= 1000.0
+                self.rival_distance = rival.lap_distance
+            self.distance = data.lap_distance
+
         except IndexError:
             return
 

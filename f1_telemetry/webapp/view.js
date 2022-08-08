@@ -26,7 +26,7 @@ function setLapData(data) {
     tyreLabel.innerHTML = compound.substring(0, 1);
     tyreCircle.setAttribute("class", "tyre-" + compound.toLowerCase());
 
-    let age = data["tyre_age"][0];
+    let age = data["tyre_age"] ? data["tyre_age"][0] : 0;
     tyreAge.innerHTML = age + (age == 1 ? " LAP" : " LAPS") + " OLD";
 }
 
@@ -63,13 +63,31 @@ function plotLapTraces(time, values) {
             name: "throttle",
             label: "Throttle",
             color: "lime",
+            width: 2,
         },
         {
             name: "brake",
             label: "Brake",
             color: "tomato",
+            width: 2,
         }
     ];
+    if (values["rival_throttle"]) {
+        brakeThrottle.push({
+            name: "rival_throttle",
+            label: "Rival Throttle",
+            color: "white",
+            width: 1,
+        });
+    }
+    if (values["rival_brake"]) {
+        brakeThrottle.push({
+            name: "rival_brake",
+            label: "Rival Brake",
+            color: "orchid",
+            width: 1,
+        });
+    }
     syncMultiTimeSeries("input", time, values, brakeThrottle, syncedPlots, { range: [0, 1] });
 
     const speed = [
@@ -79,6 +97,14 @@ function plotLapTraces(time, values) {
             color: "aqua",
         },
     ];
+    if (values["rival_speed"]) {
+        speed.push({
+            name: "rival_speed",
+            label: "Rival Speed",
+            color: "white",
+            width: 1,
+        });
+    }
     syncMultiTimeSeries("speed", time, values, speed, syncedPlots, { range: [0, 350] });
 
     const gears = [
@@ -88,7 +114,27 @@ function plotLapTraces(time, values) {
             color: "yellow",
         },
     ];
+    if (values["rival_gear"]) {
+        gears.push({
+            name: "rival_gear",
+            label: "Rival Gear",
+            color: "white",
+            width: 1,
+        });
+    }
     syncMultiTimeSeries("gears", time, values, gears, syncedPlots, { range: [0, 8] });
+
+    if (values["gap"]) {
+        const gap = [
+            {
+                name: "gap",
+                label: "Gap",
+                color: "plum",
+            },
+        ];
+        syncMultiTimeSeries("gap", time, values, gap, syncedPlots, {});
+    }
+
 
     const tyreInnerTemps = [
         {
