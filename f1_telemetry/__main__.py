@@ -21,6 +21,8 @@ def main():
 
     args = argp.parse_args()
 
+    collector = None
+
     try:
         with InfluxDBSink(org=args.org, token=args.token, bucket=args.bucket) as sink:
             print("Connected to InfluxDB")
@@ -45,6 +47,8 @@ def main():
         print("Error:", e)
 
     except KeyboardInterrupt:
+        if collector is not None:
+            collector.flush()
         print("\nBOX BOX.")
 
 

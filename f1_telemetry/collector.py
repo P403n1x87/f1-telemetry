@@ -1,3 +1,4 @@
+from collections import deque
 from f1.handler import PacketHandler
 from f1.packets import (
     TYRES,
@@ -6,6 +7,7 @@ from f1.packets import (
     Packet,
     PacketSessionData,
     PacketLapData,
+    PacketEventData,
 )
 from bisect import bisect_left
 
@@ -55,6 +57,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         super().__init__(listener)
 
         self.sink = sink
+        self.queue = deque()
 
         self.session = Session(self)
         self.motion_data = None
@@ -71,10 +74,25 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.rival_distance = 0
 
     def push(self, fields: t.Dict[str, t.Any]):
-        if self.session is None or self.session.lap == 0:
+        if self.session is None or self.session.lap == 0 or self.distance < 0:
             return
 
-        self.sink.write(f"{self.session.slug}|{self.session.lap:002}", fields)
+        current_time = self.session.time
+        self.queue.append((current_time, self.session.lap, fields))
+
+        # Flush data outside the flashback window
+        flashback_time = current_time - 16.0
+        while self.queue:
+            time, lap, data = self.queue[0]
+            if time >= flashback_time:
+                break
+            self.queue.popleft()
+            self.sink.write(f"{self.session.slug}|{lap:002}", data)
+
+    def flush(self):
+        while self.queue:
+            _, lap, data = self.queue.popleft()
+            self.sink.write(f"{self.session.slug}|{lap:002}", data)
 
     def push_live(self, _type: str, data: t.Dict[str, t.Any]):
         if self.session is None:
@@ -246,3 +264,17 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
             self.motion_data = packet.car_motion_data[_player_index(packet)].to_dict()
         except IndexError:
             return
+
+    def handle_EventData(self, packet: PacketEventData):
+        event = bytes(packet.event_string_code).decode()
+        if event == "FLBK":
+            # Flashback
+            flashback_time = packet.event_details.flashback.flashback_session_time
+
+            # Remove events that are in the future w.r.t. the flashback time
+            while self.queue:
+                time, lap, _ = self.queue[-1]
+                if time <= flashback_time:
+                    self.session.lap = lap
+                    break
+                self.queue.pop()

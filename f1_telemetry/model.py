@@ -54,6 +54,7 @@ class Session:
         self.session_uid = None
         self.track = None
         self.type = None
+        self.time = None  # seconds
 
         self._lap_data = None
 
@@ -161,6 +162,8 @@ class Session:
 
     def refresh(self, packet: PacketSessionData):
         """Refresh the current session."""
+        self.time = packet.header.session_time
+
         if self.session_uid == packet.header.session_uid:
             return
 
