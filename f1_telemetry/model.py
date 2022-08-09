@@ -1,8 +1,13 @@
-from abc import ABC, abstractmethod
+import typing as t
+from abc import ABC
+from abc import abstractmethod
 from datetime import datetime
 from enum import Enum
-from f1.packets import PacketSessionData, TRACKS, LapData, CarStatusData
-import typing as t
+
+from f1.packets import TRACKS
+from f1.packets import CarStatusData
+from f1.packets import LapData
+from f1.packets import PacketSessionData
 
 
 class SessionState(Enum):

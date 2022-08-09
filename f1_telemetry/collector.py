@@ -1,19 +1,19 @@
-from collections import deque
-from f1.handler import PacketHandler
-from f1.packets import (
-    TYRES,
-    PacketCarTelemetryData,
-    PacketFinalClassificationData,
-    Packet,
-    PacketSessionData,
-    PacketLapData,
-    PacketEventData,
-)
+import typing as t
 from bisect import bisect_left
+from collections import deque
+
+from f1.handler import PacketHandler
+from f1.packets import TYRES
+from f1.packets import Packet
+from f1.packets import PacketCarTelemetryData
+from f1.packets import PacketEventData
+from f1.packets import PacketFinalClassificationData
+from f1.packets import PacketLapData
+from f1.packets import PacketSessionData
 
 from f1_telemetry.live import enqueue
-from f1_telemetry.model import Session, SessionEventHandler
-import typing as t
+from f1_telemetry.model import Session
+from f1_telemetry.model import SessionEventHandler
 from f1_telemetry.view import SessionPrinter
 
 
@@ -231,6 +231,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.push_live("car_status", data)
 
     def handle_FinalClassificationData(self, packet: PacketFinalClassificationData):
+        self.flush()
         self.session.final_classification()
 
     def handle_LapData(self, packet: PacketLapData):
@@ -278,3 +279,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
                     self.session.lap = lap
                     break
                 self.queue.pop()
+
+            # We can flush the rest as we won't be flashing back beyond this
+            # point in time.
+            self.flush()

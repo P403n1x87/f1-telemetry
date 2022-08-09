@@ -72,11 +72,20 @@ function syncMultiTimeSeries(container, time, values, fields, group, attributes)
         .on("end", (event, d) => {
             if (group.zooming_lock)
                 return;
+
+            let i = 0;
+            let j = x.length - 1;
+
             const extent = event.selection
+            if (extent) {
+                const [a, b] = extent
+                i = d3.bisectCenter(x, xScale.invert(a));
+                j = d3.bisectCenter(x, xScale.invert(b));
+            }
 
             // Lock zooming to force a single loop.
             group.zooming_lock = true;
-            group.forEach(p => p.zoom(extent));
+            group.forEach(p => p.zoom(extent, [i, j]));
             group.zooming_lock = false;
         })
         ;
@@ -203,6 +212,7 @@ function syncMultiTimeSeries(container, time, values, fields, group, attributes)
 
 
 let range = n => [...Array(n).keys()]
+const TRACK_PADDING = 32;
 
 function traceTrack(time, data, group) {
     x = data["world_position_x"];
@@ -218,7 +228,12 @@ function traceTrack(time, data, group) {
     track.selectAll("svg").remove();
 
     const svg = track.append("svg")
-        .attr("viewBox", [xMin - 32, yMin - 32, xSize + 64, ySize + 64])
+        .attr("viewBox", [
+            xMin - TRACK_PADDING,
+            yMin - TRACK_PADDING,
+            xSize + TRACK_PADDING * 2,
+            ySize + TRACK_PADDING * 2
+        ])
         ;
 
     // add glow filter
@@ -252,7 +267,7 @@ function traceTrack(time, data, group) {
         .attr("r", 32)
         .style("filter", "url(#track-glow)")
         .style("display", "none")
-        .attr("fill", "white")
+        .attr("fill", "powderblue")
         ;
 
     svg.moveLine = i => {
@@ -266,7 +281,22 @@ function traceTrack(time, data, group) {
         point.style("display", "none");
     }
 
-    svg.zoom = extent => { }
+    svg.zoom = (_, interval) => {
+        let [i, j] = interval;
+        let [xMin, xMax] = d3.extent(x.slice(i, j));
+        let [yMin, yMax] = d3.extent(y.slice(i, j));
+        let xSize = xMax - xMin;
+        let ySize = yMax - yMin;
+        svg.transition()
+            .duration(1000)
+            .attr("viewBox", [
+                xMin - TRACK_PADDING,
+                yMin - TRACK_PADDING,
+                xSize + TRACK_PADDING * 2,
+                ySize + TRACK_PADDING * 2
+            ])
+            ;
+    }
 
     group.push(svg);
 }

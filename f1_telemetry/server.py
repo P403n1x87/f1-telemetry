@@ -1,6 +1,6 @@
 import http.server
-
 from pathlib import Path
+
 
 PORT = 20776
 

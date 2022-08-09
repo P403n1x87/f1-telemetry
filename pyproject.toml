@@ -16,6 +16,11 @@ readme = "README.md"
 repository = "https://github.com/P403n1x87/f1-telemetry"
 version = "0.0.0"
 
+[tool.isort]
+force_single_line = true
+lines_after_imports = 2
+profile = "black"
+
 [tool.poetry.dependencies]
 python = "^3.8"
 f1-packets = "^2022.1.2"

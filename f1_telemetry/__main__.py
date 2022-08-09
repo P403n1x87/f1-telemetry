@@ -1,11 +1,14 @@
 from argparse import ArgumentParser
-
 from threading import Thread
+
 from f1.listener import PacketListener
-from f1_telemetry.collector import TelemetryCollector
-from f1_telemetry.storage import InfluxDBSink, InfluxDBSinkError
-from f1_telemetry.server import serve
+
 from f1_telemetry import live
+from f1_telemetry.collector import TelemetryCollector
+from f1_telemetry.server import serve
+from f1_telemetry.storage import InfluxDBSink
+from f1_telemetry.storage import InfluxDBSinkError
+
 
 DEFAULT_BUCKET = "f1-telemetry"
 
