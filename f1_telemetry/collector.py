@@ -57,7 +57,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         super().__init__(listener)
 
         self.sink = sink
-        self.queue = deque()
+        self.queue = deque()  # To handle flashbacks
 
         self.session = Session(self)
         self.motion_data = None
@@ -69,6 +69,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.gap = 0  # meters
         self.leader_distance = []
         self.leader_time = []
+        self.leader_timestamp = []
         self.rival_index = 255
         self.distance = 0
         self.rival_distance = 0
@@ -143,6 +144,21 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
 
     def on_new_session(self, session):
         self.printer.print_session(session.slug)
+        self.flush()
+
+        self.queue.clear()
+
+        self.motion_data = None
+        self.tyre_data_emitted = False
+
+        self.last_live_data.clear()
+
+        self.gap = 0  # meters
+        self.leader_distance.clear()
+        self.leader_time.clear()
+        self.rival_index = 255
+        self.distance = 0
+        self.rival_distance = 0
 
     # ---- PacketHandler ----
 
@@ -241,6 +257,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
             if rival_index != 255:
                 rival = packet.lap_data[rival_index]
                 gap = rival.lap_distance - data.lap_distance
+                self.leader_timestamp.append(packet.header.session_time)
                 if gap >= 0:
                     self.leader_distance.append(rival.lap_distance)
                     self.leader_time.append(rival.current_lap_time_in_ms)
@@ -271,6 +288,13 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         if event == "FLBK":
             # Flashback
             flashback_time = packet.event_details.flashback.flashback_session_time
+
+            # Clean up leader data
+            if self.leader_timestamp:
+                i = closest(self.leader_timestamp, flashback_time)
+                del self.leader_distance[i:]
+                del self.leader_time[i:]
+                del self.leader_timestamp[i:]
 
             # Remove events that are in the future w.r.t. the flashback time
             while self.queue:
