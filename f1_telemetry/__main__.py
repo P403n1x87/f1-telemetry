@@ -16,10 +16,28 @@ DEFAULT_BUCKET = "f1-telemetry"
 def main():
     argp = ArgumentParser(prog="f1-tel")
 
-    argp.add_argument("org", help="InfluxDB Org", type=str)
-    argp.add_argument("token", help="InfluxDB Token", type=str)
     argp.add_argument(
-        "-b", "--bucket", help="InfluxDB Bucket", type=str, default=DEFAULT_BUCKET
+        "org",
+        help="InfluxDB Org",
+        type=str,
+    )
+    argp.add_argument(
+        "token",
+        help="InfluxDB Token",
+        type=str,
+    )
+    argp.add_argument(
+        "-b",
+        "--bucket",
+        help="InfluxDB Bucket",
+        type=str,
+        default=DEFAULT_BUCKET,
+    )
+    argp.add_argument(
+        "-r",
+        "--report",
+        help="Generate reports at the end of sessions. Useful for session coordinators",
+        action="store_true",
     )
 
     args = argp.parse_args()
@@ -31,7 +49,7 @@ def main():
             print("Connected to InfluxDB")
 
             listener = PacketListener()
-            collector = TelemetryCollector(listener, sink)
+            collector = TelemetryCollector(listener, sink, args.report)
 
             server_thread = Thread(target=serve, args=(args.org, args.token))
             server_thread.daemon = True

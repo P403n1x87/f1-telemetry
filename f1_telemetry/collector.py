@@ -9,11 +9,15 @@ from f1.packets import PacketCarTelemetryData
 from f1.packets import PacketEventData
 from f1.packets import PacketFinalClassificationData
 from f1.packets import PacketLapData
+from f1.packets import PacketParticipantsData
 from f1.packets import PacketSessionData
 
 from f1_telemetry.live import enqueue
 from f1_telemetry.model import Session
 from f1_telemetry.model import SessionEventHandler
+from f1_telemetry.report import HumanCounter
+from f1_telemetry.report import QualifyingReport
+from f1_telemetry.report import RaceReport
 from f1_telemetry.view import SessionPrinter
 
 
@@ -41,6 +45,11 @@ def _player_index(packet: Packet) -> int:
     return packet.header.player_car_index
 
 
+def player_name(player) -> str:
+    name = player.name.decode()
+    return f"{name}{player.network_id}" if name == "Player" else name
+
+
 def _weather(packet: PacketSessionData) -> t.Tuple[str, str]:
     return {
         0: ("☀️", "Clear"),
@@ -53,7 +62,7 @@ def _weather(packet: PacketSessionData) -> t.Tuple[str, str]:
 
 
 class TelemetryCollector(PacketHandler, SessionEventHandler):
-    def __init__(self, listener, sink):
+    def __init__(self, listener, sink, report=False):
         super().__init__(listener)
 
         self.sink = sink
@@ -74,11 +83,20 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.distance = 0
         self.rival_distance = 0
 
+        self.report = report
+        self.drivers = {} if report else None
+        self.human_count = HumanCounter() if report else None
+
     def push(self, fields: t.Dict[str, t.Any]):
-        if self.session is None or self.session.lap == 0 or self.distance < 0:
+        current_time = self.session.time
+        if (
+            self.session is None
+            or self.session.lap == 0
+            or self.distance < 0
+            or current_time is None
+        ):
             return
 
-        current_time = self.session.time
         self.queue.append((current_time, self.session.lap, fields))
 
         # Flush data outside the flashback window
@@ -159,6 +177,10 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.rival_index = 255
         self.distance = 0
         self.rival_distance = 0
+
+        if self.report:
+            self.drivers.clear()
+            self.human_count.clear()
 
     # ---- PacketHandler ----
 
@@ -250,6 +272,18 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.flush()
         self.session.final_classification()
 
+        if self.report:
+            if self.session.is_qualifying():
+                QualifyingReport(
+                    self.drivers, packet.classification_data, self.human_count
+                ).generate(f"{self.session.slug.replace('|', '_').replace(':', '')}-Q")
+            elif self.session.is_race():
+                RaceReport(
+                    self.drivers, packet.classification_data, self.human_count
+                ).generate(f"{self.session.slug.replace('|', '_').replace(':', '')}-R")
+            else:
+                print(f"No report generated for session type {self.session.type}")
+
     def handle_LapData(self, packet: PacketLapData):
         try:
             data = packet.lap_data[_player_index(packet)]
@@ -307,3 +341,18 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
             # We can flush the rest as we won't be flashing back beyond this
             # point in time.
             self.flush()
+
+    def handle_ParticipantsData(self, packet: PacketParticipantsData):
+        if not self.report:
+            return
+
+        human_drivers = {
+            i: player_name(p)
+            for i, p in enumerate(packet.participants)
+            if p.name and not p.ai_controlled
+        }
+
+        # Measure the "humanity" of the drivers
+        self.human_count.update(human_drivers.values())
+
+        self.drivers.update(human_drivers)

@@ -77,6 +77,9 @@ class Session:
         )
 
     def _update_sector_3(self):
+        if self._lap_data is None:
+            return
+
         total_time = self._lap_data.last_lap_time_in_ms
         sector_time = self.sectors[3] = (
             0
@@ -90,6 +93,9 @@ class Session:
         return best
 
     def _update_last_lap(self) -> bool:
+        if self._lap_data is None:
+            return
+
         total_time = self._lap_data.last_lap_time_in_ms
         best = self.best_lap_time == 0 or self.best_lap_time > total_time
         if best:
@@ -198,3 +204,15 @@ class Session:
         self.state = SessionState.FINISHED
 
         self.step()
+
+    def is_qualifying(self):
+        if self.type is None:
+            return False
+
+        return 5 <= self.type <= 9
+
+    def is_race(self):
+        if self.type is None:
+            return False
+
+        return 10 <= self.type <= 12
