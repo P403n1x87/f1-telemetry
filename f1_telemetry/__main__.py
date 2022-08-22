@@ -46,7 +46,12 @@ def main():
 
     try:
         with InfluxDBSink(org=args.org, token=args.token, bucket=args.bucket) as sink:
-            print("Connected to InfluxDB")
+            if not sink.connected:
+                print(
+                    "WARNING: InfluxDB not available. Telemetry data will not be stored."
+                )
+            else:
+                print("Connected to InfluxDB")
 
             listener = PacketListener()
             collector = TelemetryCollector(listener, sink, args.report)
