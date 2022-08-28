@@ -75,13 +75,13 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.last_live_data = {}
         self.printer = SessionPrinter()
 
-        self.gap = 0  # meters
+        self.gap = 0.0  # meters
         self.leader_distance = []
         self.leader_time = []
         self.leader_timestamp = []
         self.rival_index = 255
-        self.distance = 0
-        self.rival_distance = 0
+        self.distance = 0.0
+        self.rival_distance = 0.0
 
         self.report = report
         self.drivers = {} if report else None
@@ -171,12 +171,12 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
 
         self.last_live_data.clear()
 
-        self.gap = 0  # meters
+        self.gap = 0.0  # meters
         self.leader_distance.clear()
         self.leader_time.clear()
         self.rival_index = 255
-        self.distance = 0
-        self.rival_distance = 0
+        self.distance = 0.0
+        self.rival_distance = 0.0
 
         if self.report:
             self.drivers.clear()
@@ -292,7 +292,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
                 rival = packet.lap_data[rival_index]
                 gap = rival.lap_distance - data.lap_distance
                 self.leader_timestamp.append(packet.header.session_time)
-                if gap >= 0:
+                if gap >= 0.0:
                     self.leader_distance.append(rival.lap_distance)
                     self.leader_time.append(rival.current_lap_time_in_ms)
                     i = closest(self.leader_distance, data.lap_distance)

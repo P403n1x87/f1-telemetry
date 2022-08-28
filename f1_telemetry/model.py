@@ -53,9 +53,9 @@ class Session:
         self.best_lap_time = 0
         self.best_sectors = [None, 0, 0, 0]
         self.best_lap_sectors = [None, 0, 0, 0]
-        self.tyre = None
+        self.tyre: t.Optional[str] = None
         self.tyre_age = None
-        self.slug = None
+        self.slug: t.Optional[str] = None
         self.session_uid = None
         self.track = None
         self.type = None
@@ -94,7 +94,7 @@ class Session:
 
     def _update_last_lap(self) -> bool:
         if self._lap_data is None:
-            return
+            return False
 
         total_time = self._lap_data.last_lap_time_in_ms
         best = self.best_lap_time == 0 or self.best_lap_time > total_time

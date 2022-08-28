@@ -42,4 +42,8 @@ class InfluxDBSink:
         p._fields.update(fields)
         p.time(datetime.utcnow(), WritePrecision.MS)
 
-        self._write_api.write(bucket=self.bucket, record=p)
+        try:
+            self._write_api.write(bucket=self.bucket, record=p)
+        except Exception as e:
+            # Best effort
+            print(f"[ERROR] Cannot write to InfluxDB: {e}")

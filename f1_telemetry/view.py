@@ -66,11 +66,13 @@ class SessionPrinter:
             self.print_lap(lap)
             self._reprint_sectors(4, lap)
 
-        time = str(timedelta(milliseconds=time))[2:-3].center(13)
+        time_repr = str(timedelta(milliseconds=time))[2:-3].center(13)
         if best:
-            print(f"\033[95m" + f"{time}".center(10) + "\033[0m", end="", flush=True)
+            print(
+                f"\033[95m" + f"{time_repr}".center(10) + "\033[0m", end="", flush=True
+            )
         else:
-            print(time, end="", flush=True)
+            print(time_repr, end="", flush=True)
 
         self.lap_ended = True
 
