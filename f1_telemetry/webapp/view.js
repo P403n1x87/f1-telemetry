@@ -135,6 +135,21 @@ function plotLapTraces(time, values) {
         syncMultiTimeSeries("gap", time, values, gap, syncedPlots, {});
     }
 
+    if (values["rival_steer"]) {
+        const steer = [
+            {
+                name: "steer",
+                label: "Steer",
+                color: "chartreuse",
+            },
+            {
+                name: "rival_steer",
+                label: "Rival Steer",
+                color: "white",
+            },
+        ];
+        syncMultiTimeSeries("steer", time, values, steer, syncedPlots, { range: [-1, 1] });
+    }
 
     const tyreInnerTemps = [
         {

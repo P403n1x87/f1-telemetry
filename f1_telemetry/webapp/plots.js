@@ -2,7 +2,7 @@ function syncMultiTimeSeries(container, time, values, fields, group, attributes)
     // set the dimensions and margins of the graph
     const margin = { top: 10, right: 1, bottom: 30, left: 0 },
         width = 460 - margin.left - margin.right,
-        height = 160 - margin.top - margin.bottom;
+        height = (values["rival_distance"] === undefined ? 160 : 120) - margin.top - margin.bottom;
 
     // append the svg object to the body of the page
     const parent = d3.select(`#${container}`)
