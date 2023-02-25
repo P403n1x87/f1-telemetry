@@ -34,6 +34,13 @@ def main():
         default=DEFAULT_BUCKET,
     )
     argp.add_argument(
+        "-H",
+        "--host",
+        help="Server host address",
+        type=str,
+        default="localhost",
+    )
+    argp.add_argument(
         "-r",
         "--report",
         help="Generate reports at the end of sessions. Useful for session coordinators",
@@ -56,7 +63,7 @@ def main():
             listener = PacketListener()
             collector = TelemetryCollector(listener, sink, args.report)
 
-            server_thread = Thread(target=serve, args=(args.org, args.token))
+            server_thread = Thread(target=serve, args=(args.org, args.token, args.host))
             server_thread.daemon = True
             server_thread.start()
 
@@ -67,7 +74,7 @@ def main():
 
             print("Starting live data websocket server")
             # FIXME: Mixing asyncio and threads is yuck!
-            live.serve()
+            live.serve(host=args.host)
 
     except InfluxDBSinkError as e:
         print("Error:", e)

@@ -129,7 +129,7 @@ function updateFuel(data) {
 
 // ---- WebSocket ----
 
-let socket = new WebSocket("ws://localhost:20775");
+let socket = new WebSocket(`ws://${host}:20775`);
 
 socket.onopen = event => {
     console.log("[open] Connection established");

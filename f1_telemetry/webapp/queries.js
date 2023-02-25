@@ -1,6 +1,6 @@
 import { InfluxDB } from 'https://cdn.jsdelivr.net/npm/@influxdata/influxdb-client@1.27.0/dist/index.browser.mjs'
 
-const url = "http://localhost:8086"
+const url = `http://${host}:8086`
 
 const influxDB = new InfluxDB({ url, token })
 

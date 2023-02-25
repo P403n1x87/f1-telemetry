@@ -47,10 +47,10 @@ async def consume_queue(websocket):
         return
 
 
-async def _serve():
-    async with websockets.serve(consume_queue, "localhost", 20775):
+async def _serve(host="localhost", port=20775):
+    async with websockets.serve(consume_queue, host, port):
         await asyncio.Future()  # run forever
 
 
-def serve():
-    loop.run_until_complete(_serve())
+def serve(host="localhost", port=20775):
+    loop.run_until_complete(_serve(host, port))
