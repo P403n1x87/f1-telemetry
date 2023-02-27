@@ -167,6 +167,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.queue.clear()
 
         self.motion_data = None
+        self.rival_motion_data = None
         self.tyre_data_emitted = False
 
         self.last_live_data.clear()
@@ -216,6 +217,9 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
             return
 
         data.update(self.motion_data)
+        if self.rival_motion_data:
+            data.update(self.rival_motion_data)
+            self.rival_motion_data = None
         self.motion_data = None
 
         data["distance"] = self.distance
@@ -315,6 +319,13 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
     def handle_MotionData(self, packet):
         try:
             self.motion_data = packet.car_motion_data[_player_index(packet)].to_dict()
+            if self.rival_index != 255:
+                self.rival_motion_data = {
+                    f"rival_{k}": v
+                    for k, v in packet.car_motion_data[self.rival_index]
+                    .to_dict()
+                    .items()
+                }
         except IndexError:
             return
 

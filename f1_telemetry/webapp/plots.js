@@ -218,8 +218,20 @@ function traceTrack(time, data, group) {
     x = data["world_position_x"];
     y = data["world_position_z"];
 
+    rivalX = data["rival_world_position_x"];
+    rivalY = data["rival_world_position_z"];
+
+
     let [xMin, xMax] = d3.extent(x);
     let [yMin, yMax] = d3.extent(y);
+
+    let [xMin2, xMax2] = rivalX ? d3.extent(rivalX) : [xMin, xMax];
+    let [yMin2, yMax2] = rivalY ? d3.extent(rivalY) : [yMin, yMax];
+
+    xMin = Math.min(xMin, xMin2);
+    xMax = Math.max(xMax, xMax2);
+    yMin = Math.min(yMin, yMin2);
+    yMax = Math.max(yMax, yMax2);
 
     let xSize = xMax - xMin;
     let ySize = yMax - yMin;
@@ -250,13 +262,29 @@ function traceTrack(time, data, group) {
     feMerge.append("feMergeNode")
         .attr("in", "SourceGraphic");
 
+    if (rivalX && rivalY) {
+        // Trace the rival track
+        svg.append("path")
+            .datum(range(rivalX.length))
+            .style("filter", "url(#track-glow)")
+            .attr("fill", "none")
+            .attr("stroke", "#d1d17f")
+            .attr("opacity", 0.5)
+            .attr("stroke-width", 16)
+            .attr("d", d3.line()
+                .x((_, i) => rivalX[i])
+                .y((_, i) => rivalY[i])
+            );
+    }
+
     // Trace the track
     svg.append("path")
         .datum(range(x.length))
         .style("filter", "url(#track-glow)")
         .attr("fill", "none")
         .attr("stroke", "#f0f0f0")
-        .attr("stroke-width", 24)
+        .attr("opacity", 0.5)
+        .attr("stroke-width", 16)
         .attr("d", d3.line()
             .x((_, i) => x[i])
             .y((_, i) => y[i])
