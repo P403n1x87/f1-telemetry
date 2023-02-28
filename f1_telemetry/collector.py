@@ -1,10 +1,13 @@
+import threading
 import typing as t
 from bisect import bisect_left
 from collections import deque
 
+import pyttsx3
 from f1.handler import PacketHandler
 from f1.packets import TYRES
 from f1.packets import Packet
+from f1.packets import PacketCarDamageData
 from f1.packets import PacketCarTelemetryData
 from f1.packets import PacketEventData
 from f1.packets import PacketFinalClassificationData
@@ -87,6 +90,12 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.drivers = {} if report else None
         self.human_count = HumanCounter() if report else None
 
+        self.max_tyre_wear = None
+        self.stop_needed = False
+        self.wing_status = (0, 0)
+
+        self.last_packets = {}
+
     def push(self, fields: t.Dict[str, t.Any]):
         current_time = self.session.time
         if (
@@ -142,12 +151,44 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         )
 
     def on_new_lap(self, current_lap, previous_lap, previous_sectors, best):
+        damage_packet = self.get_last(PacketCarDamageData)
+
         last_lap_time = sum(previous_sectors)
+        rate_per_lap = 0
+
+        # Estimate tyre wear rate
+        current_max_wear = max(
+            damage_packet.car_damage_data[_player_index(damage_packet)].tyres_wear
+        )
+        if self.max_tyre_wear is not None:
+            rate_per_lap = current_max_wear - self.max_tyre_wear
+            if rate_per_lap > 0:
+                remaining_laps = (
+                    self.get_last(PacketSessionData).total_laps - previous_lap
+                )
+                laps_to_pit = int((75 - current_max_wear) / rate_per_lap)
+                self.stop_needed = laps_to_pit >= remaining_laps
+                if 0 < laps_to_pit < min(5, remaining_laps):
+                    self.engineer(
+                        f"Pit in {laps_to_pit} laps. {laps_to_pit} laps till pit"
+                        if laps_to_pit > 1
+                        else "BOX BOX BOX!"
+                    )
+                elif current_max_wear > 25:
+                    self.engineer(
+                        f"Tyre wear {round(current_max_wear)}. Degradation rate {round(rate_per_lap)}."
+                    )
+                    if self.stop_needed:
+                        self.engineer("Pit required.")
+        self.max_tyre_wear = current_max_wear
+
         if last_lap_time > 0:
             self.push({"total_time_ms": last_lap_time})
             self.printer.print_lap_time(previous_lap, last_lap_time, best)
             if self.tyre_data_emitted:
-                self.printer.print_tyre(self.session.tyre, self.session.tyre_age)
+                self.printer.print_tyre(
+                    self.session.tyre, self.session.tyre_age, rate_per_lap
+                )
 
         if current_lap:
             self.printer.print_lap(current_lap)
@@ -271,6 +312,12 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
             if isinstance(v, list) and len(v) == len(TYRES):
                 _flatten_tyre_values(data, k)
 
+        # Keep track of wing damage
+        wing_status = data["front_left_wing_damage"], data["front_right_wing_damage"]
+        if wing_status != self.wing_status and any(wing_status):
+            self.engineer("Wing damage at {} {}".format(*wing_status))
+        self.wing_status = wing_status
+
         self.push_live("car_status", data)
 
     def handle_FinalClassificationData(self, packet: PacketFinalClassificationData):
@@ -368,3 +415,17 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.human_count.update(human_drivers.values())
 
         self.drivers.update(human_drivers)
+
+    def handle_generic(self, packet):
+        self.last_packets[type(packet)] = packet
+
+    def get_last(self, packet_type):
+        return self.last_packets.get(packet_type)
+
+    def engineer(self, message):
+        def _():
+            engine = pyttsx3.init()
+            engine.say(message)
+            engine.runAndWait()
+
+        threading.Thread(target=_).start()
