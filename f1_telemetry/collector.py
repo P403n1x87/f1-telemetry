@@ -94,6 +94,8 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.stop_needed = False
         self.wing_status = (0, 0)
 
+        self._last_forecast = None
+
         self.last_packets = {}
 
     def push(self, fields: t.Dict[str, t.Any]):
@@ -167,7 +169,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
                     self.get_last(PacketSessionData).total_laps - previous_lap
                 )
                 laps_to_pit = int((75 - current_max_wear) / rate_per_lap)
-                self.stop_needed = laps_to_pit >= remaining_laps
+                self.stop_needed = laps_to_pit < remaining_laps
                 if 0 < laps_to_pit < min(5, remaining_laps):
                     self.engineer(
                         f"Pit in {laps_to_pit} laps. {laps_to_pit} laps till pit"
@@ -229,6 +231,31 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
     def handle_SessionData(self, packet):
         self.session.refresh(packet)
 
+        forecasts = [
+            s
+            for s in packet.weather_forecast_samples
+            if s.time_offset > 0 and s.session_type == packet.session_type
+        ]
+
+        if not forecasts:
+            return
+
+        _ = forecasts[0]
+        next_forecast = (_weather(_)[1], _.time_offset, _.rain_percentage)
+        # Only notify if the forecast changes significantly
+        if (
+            self._last_forecast is not None
+            and next_forecast != self._last_forecast
+            and (
+                next_forecast[0] != self._last_forecast[0]
+                or abs(next_forecast[-1] - self._last_forecast[-1]) > 10
+            )
+        ):
+            self.engineer(
+                r"{} in {} minutes with {}% chance of rain".format(*next_forecast)
+            )
+        self._last_forecast = next_forecast
+
         self.push_live(
             "weather_data",
             {
@@ -237,12 +264,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
                     (sample.time_offset, *_weather(sample), sample.rain_percentage)
                     for _, sample in zip(
                         range(4),
-                        (
-                            s
-                            for s in packet.weather_forecast_samples
-                            if s.time_offset > 0
-                            and s.session_type == packet.session_type
-                        ),
+                        forecasts,
                     )
                 ],
             },
