@@ -126,6 +126,12 @@ function updateFuel(data) {
     fuelField.style("fill", data > 0 ? "lime" : "red");
 }
 
+function updateTrace(data) {
+    pushTraceData(
+        [data.distance, data.throttle, data.brake],
+        [data.rival_distance, data.rival_throttle, data.rival_brake]
+    );
+}
 
 // ---- WebSocket ----
 
@@ -154,6 +160,10 @@ socket.onmessage = event => {
 
         case "fuel":
             updateFuel(message.data);
+            break;
+
+        case "trace":
+            updateTrace(message.data);
             break;
 
         default:
