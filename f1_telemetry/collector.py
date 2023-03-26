@@ -297,6 +297,8 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
                 data["rival_distance"] = self.rival_distance
                 data["rival_steer"] = rival.steer
 
+                self.push_live("trace", data)
+
         self.push_live("tyre_temp", data["tyres_inner_temperature"])
 
         for k, v in dict(data).items():
