@@ -1,6 +1,7 @@
 import threading
 import typing as t
 from bisect import bisect_left
+from collections import defaultdict
 from collections import deque
 
 import pyttsx3
@@ -237,6 +238,23 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
             if s.time_offset > 0 and s.session_type == packet.session_type
         ]
 
+        # Get the next session's forecast
+        other_sessions_forecast = defaultdict(list)
+        for f in (
+            s
+            for s in packet.weather_forecast_samples
+            if s.time_offset > 0 and s.session_type != packet.session_type
+        ):
+            other_sessions_forecast[f.session_type].append(f)
+        try:
+            next_session_forecast = other_sessions_forecast[
+                min(
+                    _ for _ in other_sessions_forecast.keys() if _ > packet.session_type
+                )
+            ]
+        except Exception:
+            next_session_forecast = []
+
         if not forecasts:
             return
 
@@ -267,6 +285,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
                         forecasts,
                     )
                 ],
+                "nforecasts": [_weather(s)[0] for s in next_session_forecast],
             },
         )
 

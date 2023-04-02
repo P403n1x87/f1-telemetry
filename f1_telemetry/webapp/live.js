@@ -116,13 +116,17 @@ function updateWeather(data) {
     weatherIcon.text(data.weather[0]);
     weatherCond.text(data.weather[1]);
 
-    for (let i in data.forecasts) {
+    for (let i = 0; i < 4; i++) {
         const forecast = data.forecasts[i];
-        j = parseInt(i) + 1;
-        d3.select(`#forecast${j}-icon`).text(forecast[1]);
-        d3.select(`#forecast${j}-cond`).text(forecast[2]);
-        d3.select(`#forecast${j}-offset`).text(`+${forecast[0]}m`);
-        d3.select(`#forecast${j}-pp`).text(`${forecast[3]}%`);
+        let j = i + 1;
+        d3.select(`#forecast${j}-icon`).text(forecast ? forecast[1] : "");
+        d3.select(`#forecast${j}-cond`).text(forecast ? forecast[2] : "no data");
+        d3.select(`#forecast${j}-offset`).text(forecast ? `+${forecast[0]}m` : "");
+        d3.select(`#forecast${j}-pp`).text(forecast ? `${forecast[3]}%` : "");
+    }
+    for (let i = 0; i < 4; i++) {
+        const forecast = data.nforecasts[i];
+        d3.select(`#nforecast${i + 1}`).text(forecast || "");
     }
 }
 
@@ -213,9 +217,11 @@ initForecast = [
     [30, "☀️", "Clear", 0]
 ]
 
+initNForecast = ["☀️", "☀️", "☀️", "☀️"]
+
 updateFrontWing(initData);
 updateTyreWear(initData);
 updateTyreTemp([60, 60, 60, 60]);
-updateWeather({ weather: ["☀️", "Clear"], forecasts: initForecast })
+updateWeather({ weather: ["☀️", "Clear"], forecasts: initForecast, nforecasts: initNForecast })
 updateFuel(0);
 updateGap(0);
