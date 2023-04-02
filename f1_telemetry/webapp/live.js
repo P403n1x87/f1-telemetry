@@ -31,11 +31,13 @@ const weatherCond = d3.select("#weather-cond");
 
 const fuelField = d3.select("#fuel").select("tspan");
 
+const gapField = d3.select("#gap");
 
 // ---- Scales and colors ----
 
 const wearScale = d3.scaleLinear().domain([0, 100]).range([0.5, 1]);
 const tyreTempScale = d3.scaleLinear([0, 200], [0, 1]);
+const gapScale = d3.scaleLinear([2, -2], [0, 1]);
 
 function wearColor(value) {
     return d3.color(d3.interpolateTurbo(wearScale(value)))
@@ -45,6 +47,9 @@ function tyreColor(value) {
     return d3.color(d3.interpolateTurbo(tyreTempScale(value)));
 }
 
+function gapColor(value) {
+    return d3.color(d3.interpolateBrBG(gapScale(value)));
+}
 
 // ---- Updaters ----
 
@@ -126,6 +131,11 @@ function updateFuel(data) {
     fuelField.style("fill", data > 0 ? "lime" : "red");
 }
 
+function updateGap(data) {
+    gapField.text(`${data.toFixed(2)}`);
+    gapField.style("color", gapColor(data));
+}
+
 function updateTrace(data) {
     pushTraceData(
         [data.distance, data.throttle, data.brake],
@@ -164,6 +174,7 @@ socket.onmessage = event => {
 
         case "trace":
             updateTrace(message.data);
+            updateGap(message.data.gap);
             break;
 
         default:
@@ -207,3 +218,4 @@ updateTyreWear(initData);
 updateTyreTemp([60, 60, 60, 60]);
 updateWeather({ weather: ["☀️", "Clear"], forecasts: initForecast })
 updateFuel(0);
+updateGap(0);
