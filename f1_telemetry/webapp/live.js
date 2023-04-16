@@ -37,7 +37,7 @@ const gapField = d3.select("#gap");
 
 const wearScale = d3.scaleLinear().domain([0, 100]).range([0.5, 1]);
 const tyreTempScale = d3.scaleLinear([0, 200], [0, 1]);
-const gapScale = d3.scaleLinear([2, -2], [0, 1]);
+const gapScale = d3.scaleLinear([3, -3], [0.25, 0.75]);
 
 function wearColor(value) {
     return d3.color(d3.interpolateTurbo(wearScale(value)))
