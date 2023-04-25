@@ -3,6 +3,7 @@ import typing as t
 from bisect import bisect_left
 from collections import defaultdict
 from collections import deque
+from time import time
 
 import pyttsx3
 from f1.handler import PacketHandler
@@ -98,6 +99,10 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self._last_forecast = None
 
         self.last_packets = {}
+
+        self.sc_slow_down_timestamp = 0
+
+        self.rival_motion_data = None
 
     def push(self, fields: t.Dict[str, t.Any]):
         current_time = self.session.time
@@ -400,6 +405,11 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
                 self.gap /= 1000.0
                 self.rival_distance = rival.lap_distance
             self.distance = data.lap_distance
+
+            # Alert if negative SC delta
+            if data.safety_car_delta < 0.0 and time() > self.sc_slow_down_timestamp:
+                self.engineer(f"Delta {round(data.safety_car_delta, 1)} Slow down!")
+                self.sc_slow_down_timestamp = time() + 5.0
 
         except IndexError:
             return
