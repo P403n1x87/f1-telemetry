@@ -89,14 +89,17 @@ class RaceReport(Report):
         final_data = []
         for i, name in self.drivers.items():
             data = self.data[i]
+
+            total_time = (data.total_race_time + data.penalties_time) * 1000
+
             final_data.append(
                 (
                     data.position,
                     name,
                     data.best_lap_time_in_ms,
                     fmtt(data.best_lap_time_in_ms),
-                    data.total_race_time * 1000,
-                    fmtt(data.total_race_time * 1000),
+                    total_time,
+                    fmtt(total_time),
                     data.num_laps,
                     result_status(data),
                     data.penalties_time,
