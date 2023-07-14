@@ -195,9 +195,9 @@ class Session:
         self.step()
 
     def car_status_data(self, data: CarStatusData):
-        self.tyre = {16: "Soft", 17: "Medium", 18: "Hard", 7: "Inter", 8: "Wet"}[
-            data.visual_tyre_compound
-        ]
+        self.tyre = {16: "Soft", 17: "Medium", 18: "Hard", 7: "Inter", 8: "Wet"}.get(
+            data.visual_tyre_compound, "Unknown"
+        )
         self.tyre_age = data.tyres_age_laps
 
     def final_classification(self):

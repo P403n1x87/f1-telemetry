@@ -90,7 +90,7 @@ class RaceReport(Report):
         for i, name in self.drivers.items():
             data = self.data[i]
 
-            total_time = (data.total_race_time + data.penalties_time) * 1000
+            total_time = int((data.total_race_time + data.penalties_time) * 1000)
 
             final_data.append(
                 (
