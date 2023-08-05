@@ -34,6 +34,20 @@ def main():
         default=DEFAULT_BUCKET,
     )
     argp.add_argument(
+        "-a",
+        "--address",
+        help="F1 game telemetry address",
+        type=str,
+        default="localhost",
+    )
+    argp.add_argument(
+        "-p",
+        "--port",
+        help="F1 game telemetry port",
+        type=int,
+        default=20777,
+    )
+    argp.add_argument(
         "-H",
         "--host",
         help="Server host address",
@@ -60,7 +74,7 @@ def main():
             else:
                 print("Connected to InfluxDB")
 
-            listener = PacketListener()
+            listener = PacketListener(host=args.address, port=args.port)
             collector = TelemetryCollector(listener, sink, args.report)
 
             server_thread = Thread(target=serve, args=(args.org, args.token, args.host))
