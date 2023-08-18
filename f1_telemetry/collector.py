@@ -22,6 +22,7 @@ from f1_telemetry.model import Session
 from f1_telemetry.model import SessionEventHandler
 from f1_telemetry.report import HumanCounter
 from f1_telemetry.report import QualifyingReport
+from f1_telemetry.report import RaceDirector
 from f1_telemetry.report import RaceReport
 from f1_telemetry.view import SessionPrinter
 
@@ -103,6 +104,8 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.sc_slow_down_timestamp = 0
 
         self.rival_motion_data = None
+
+        self.race_director = None
 
     def push(self, fields: t.Dict[str, t.Any]):
         current_time = self.session.time
@@ -231,6 +234,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         if self.report:
             self.drivers.clear()
             self.human_count.clear()
+            self.race_director = RaceDirector(self.drivers)
 
     # ---- PacketHandler ----
 
@@ -381,6 +385,11 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
                 RaceReport(
                     self.drivers, packet.classification_data, self.human_count
                 ).generate(f"{self.session.slug.replace('|', '_').replace(':', '')}-R")
+                if self.race_director is not None:
+                    self.race_director.generate(
+                        f"{self.session.slug.replace('|', '_').replace(':', '')}-D"
+                    )
+                    self.race_director = None
             else:
                 print(f"No report generated for session type {self.session.type}")
 
@@ -453,6 +462,9 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
             # We can flush the rest as we won't be flashing back beyond this
             # point in time.
             self.flush()
+        elif event == "PENA":
+            if self.race_director is not None:
+                self.race_director.record_incident(packet.event_details.penalty)
 
     def handle_ParticipantsData(self, packet: PacketParticipantsData):
         if not self.report:
