@@ -107,6 +107,8 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
 
         self.race_director = None
 
+        self.last_fuel = None
+
     def push(self, fields: t.Dict[str, t.Any]):
         current_time = self.session.time
         if (
@@ -200,6 +202,9 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
                 self.printer.print_tyre(
                     self.session.tyre, self.session.tyre_age, rate_per_lap
                 )
+            if self.last_fuel is not None and self.session.fuel is not None:
+                self.printer.print_fuel(self.session.fuel, self.last_fuel)
+            self.last_fuel = self.session.fuel
 
         if current_lap:
             self.printer.print_lap(current_lap)
@@ -230,6 +235,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.rival_index = 255
         self.distance = 0.0
         self.rival_distance = 0.0
+        self.last_fuel = None
 
         if self.report:
             self.drivers.clear()
@@ -353,6 +359,9 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
             self.tyre_data_emitted = True
 
         self.push_live("fuel", data.fuel_remaining_laps)
+
+        if self.last_fuel is None:
+            self.last_fuel = data.fuel_remaining_laps
 
     def handle_CarDamageData(self, packet):
         try:
