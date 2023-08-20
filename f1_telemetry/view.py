@@ -86,3 +86,14 @@ class SessionPrinter:
             end="",
             flush=True,
         )
+
+    def print_fuel(self, current_fuel: float, previous_fuel: float) -> None:
+        current_color = "32" if current_fuel >= 0 else "31"
+        delta_color = "32" if current_fuel - previous_fuel >= 0 else "31"
+
+        print(
+            f"  fuel \033[30;{current_color}m{current_fuel:.2f}\033[0m "
+            f"(Δ: \033[30;{delta_color}m{current_fuel-previous_fuel:.2f}\033[0m)",
+            end="",
+            flush=True,
+        )

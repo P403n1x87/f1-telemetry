@@ -60,6 +60,7 @@ class Session:
         self.track = None
         self.type = None
         self.time = None  # seconds
+        self.fuel = None
 
         self._lap_data = None
 
@@ -199,6 +200,7 @@ class Session:
             data.visual_tyre_compound, "Unknown"
         )
         self.tyre_age = data.tyres_age_laps
+        self.fuel = data.fuel_remaining_laps
 
     def final_classification(self):
         self.state = SessionState.FINISHED
