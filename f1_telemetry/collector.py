@@ -498,8 +498,11 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
 
     def engineer(self, message):
         def _():
-            engine = pyttsx3.init()
-            engine.say(message)
-            engine.runAndWait()
+            try:
+                engine = pyttsx3.init()
+                engine.say(message)
+                engine.runAndWait()
+            except:
+                pass
 
         threading.Thread(target=_).start()
