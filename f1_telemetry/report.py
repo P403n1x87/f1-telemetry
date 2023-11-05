@@ -62,7 +62,9 @@ class Report:
         pass
 
     def generate(self, report_name: str) -> None:
-        with open(f"{report_name}.csv", "w", newline="") as final_file:
+        with open(
+            f"{report_name}.csv", "w", newline="", encoding="utf-8"
+        ) as final_file:
             writer = csv.writer(final_file)
             for row in self.rows():
                 writer.writerow(row)
