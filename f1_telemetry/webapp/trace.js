@@ -37,9 +37,11 @@ g.append("defs").append("clipPath")
 
 let rb = addTrace(secondaryData, "rivalBrakeLine");
 let rt = addTrace(secondaryData, "rivalThrottleLine");
+let rsp = addTrace(secondaryData, "rivalSpeedLine");
 
 let b = addTrace(primaryData, "brakeLine");
 let t = addTrace(primaryData, "throttleLine");
+let sp = addTrace(primaryData, "speedLine");
 
 function addTrace(data, style) {
     return g.append("g")
@@ -51,6 +53,7 @@ function addTrace(data, style) {
 
 let line1 = makeLine(1);
 let line2 = makeLine(2);
+let line3 = makeLine(3);
 
 function pushTraceData(p, s) {
     while (primaryData.length > 0 && primaryData.at(-1)[0] >= p[0]) {
@@ -67,8 +70,10 @@ function pushTraceData(p, s) {
     // Redraw the line.
     t.attr("d", line1).attr("transform", null);
     b.attr("d", line2).attr("transform", null);
+    sp.attr("d", line3).attr("transform", null);
     rt.attr("d", line1).attr("transform", null);
     rb.attr("d", line2).attr("transform", null);
+    rsp.attr("d", line3).attr("transform", null);
 
     // Pop the old data point off the front.
     let [lo, hi] = xDomain
@@ -107,7 +112,7 @@ function pushTraceData(p, s) {
 //         lo = 3 * n + 10;
 //         mo = lo + 25;
 //     }
-//     let p = [lo + random(), random(), random()];
-//     let s = [mo + random(), random(), random()];
+//     let p = [lo + random() * 10, random(), random(), random()];
+//     let s = [mo + random() * 10, random(), random(), random()];
 //     pushTraceData(p, s);
 // }
