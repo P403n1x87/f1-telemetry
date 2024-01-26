@@ -142,8 +142,8 @@ function updateGap(data) {
 
 function updateTrace(data) {
     pushTraceData(
-        [data.distance, data.throttle, data.brake],
-        [data.rival_distance, data.rival_throttle, data.rival_brake]
+        [data.distance, data.throttle, data.brake, data.speed / 350],
+        [data.rival_distance, data.rival_throttle, data.rival_brake, data.rival_speed / 350]
     );
 }
 
