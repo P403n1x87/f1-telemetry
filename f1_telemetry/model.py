@@ -8,6 +8,7 @@ from f1.packets import TRACKS
 from f1.packets import CarStatusData
 from f1.packets import LapData
 from f1.packets import PacketSessionData
+from f1.packets import SessionType
 
 
 class SessionState(Enum):
@@ -19,8 +20,7 @@ class SessionState(Enum):
 
 class SessionEventHandler(ABC):
     @abstractmethod
-    def on_new_session(self, session: "Session") -> None:
-        ...
+    def on_new_session(self, session: "Session") -> None: ...
 
     @abstractmethod
     def on_new_lap(
@@ -29,16 +29,15 @@ class SessionEventHandler(ABC):
         previous_lap: int,
         previous_sectors: t.Tuple[int, int, int],
         best: bool,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @abstractmethod
-    def on_sector(self, n: int, lap: int, time: float, best: bool) -> None:
-        ...
+    def on_sector(self, n: int, lap: int, time: float, best: bool) -> None: ...
 
     @abstractmethod
-    def on_finish(self, lap: int, sectors: t.Tuple[int, int, int], best: bool) -> None:
-        ...
+    def on_finish(
+        self, lap: int, sectors: t.Tuple[int, int, int], best: bool
+    ) -> None: ...
 
 
 class Session:
@@ -144,7 +143,14 @@ class Session:
                 )
 
             elif self.sector < current_sector:  # new sector
-                sector_time = getattr(self._lap_data, f"sector{self.sector}_time_in_ms")
+                sector_time = getattr(
+                    self._lap_data, f"sector{self.sector}_time_ms_part"
+                )
+                sector_time += (
+                    getattr(self._lap_data, f"sector{self.sector}_time_minutes_part")
+                    * 60
+                    * 1000
+                )
                 self.sectors[self.sector] = sector_time
                 best = (
                     self.best_sectors[self.sector] == 0
@@ -211,10 +217,10 @@ class Session:
         if self.type is None:
             return False
 
-        return 5 <= self.type <= 9
+        return SessionType.Q <= self.type <= SessionType.OSSQ
 
     def is_race(self):
         if self.type is None:
             return False
 
-        return 10 <= self.type <= 12
+        return SessionType.RACE <= self.type <= SessionType.RACE_3

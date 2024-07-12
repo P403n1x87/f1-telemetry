@@ -9,9 +9,7 @@ classifiers = [
 description = "F1 telemetry data collection and visualisation"
 authors = ["Gabriele N. Tornetta <phoenix1987@gmail.com>"]
 license = "MIT"
-packages = [
-  {include = "f1_telemetry"},
-]
+packages = [{ include = "f1_telemetry" }]
 readme = "README.md"
 repository = "https://github.com/P403n1x87/f1-telemetry"
 version = "0.0.0"
@@ -23,7 +21,7 @@ profile = "black"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-f1-packets = "^2023.1.0"
+f1-packets = "^2024.1.0"
 influxdb-client = "^1.30.0"
 websockets = "^10.3"
 pyttsx3 = "2.71"
