@@ -214,7 +214,10 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.leader_time.clear()
 
     def on_finish(self, lap, sectors, best):
-        self.on_new_lap(None, lap, sectors, best)
+        try:
+            self.on_new_lap(None, lap, sectors, best)
+        except Exception:
+            pass
         print("🏁")
 
     def on_new_session(self, session):
