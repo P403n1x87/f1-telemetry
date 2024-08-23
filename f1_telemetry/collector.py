@@ -16,6 +16,7 @@ from f1.packets import PacketFinalClassificationData
 from f1.packets import PacketLapData
 from f1.packets import PacketParticipantsData
 from f1.packets import PacketSessionData
+from f1.packets import SessionType
 
 from f1_telemetry.live import enqueue
 from f1_telemetry.model import Session
@@ -323,7 +324,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.motion_data = None
 
         data["distance"] = self.distance
-        if self.session.type == 13:
+        if self.session.type == SessionType.TT:
             data["gap"] = self.gap
             if self.rival_index != 255:
                 rival = packet.car_telemetry_data[self.rival_index]
