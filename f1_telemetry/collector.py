@@ -65,7 +65,7 @@ def _weather(packet: PacketSessionData) -> t.Tuple[str, str]:
         3: ("🌦️", "Light rain"),
         4: ("🌧️", "Heavy rain"),
         5: ("⛈️", "Storm"),
-    }[packet.weather]
+    }.get(packet.weather, ("?", packet.weather))
 
 
 class TelemetryCollector(PacketHandler, SessionEventHandler):
