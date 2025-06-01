@@ -21,7 +21,7 @@ profile = "black"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-f1-packets = "^2024.1.0"
+f1-packets = "^2025.1.0"
 influxdb-client = "^1.30.0"
 websockets = "^10.3"
 pyttsx3 = "2.71"
