@@ -1,12 +1,12 @@
 <!doctype html>
 <html>
 <head>
-  <title>F1 Telemetry</title>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-  <link href="style.css" rel="stylesheet"> 
+    <title>F1 Telemetry</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -23,7 +23,7 @@
                     <ul class="text-sm" id="session_list"/>
                 </div>
             </div>
-            
+
             <!-- Laps -->
             <div id="laps" class="p-1 flex flex-col">
                 <div class="p-1 text-center font-bold">LAPS</div>
@@ -34,7 +34,7 @@
 
             <!-- Spacer -->
             <div id="spacer" class="p-1 flex flex-col flex-grow"></div>
-            
+
             <!-- Info box -->
             <div id="info" class="flex flex-row flex-grow hidden">
                 <!-- Track -->
@@ -70,7 +70,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Tyre -->
                 <div class="p-1 text-center flex-col">
                     <div class="flex-grow-0 flex-col">
@@ -101,6 +101,7 @@
             <div class="flex flex-col flex-grow">
                 <div id="tstemp" class="plot"></div>
                 <div id="titemp" class="plot"></div>
+                <div id="twear" class="plot"></div>
                 <div id="pressures" class="plot"></div>
             </div>
         </div>
@@ -111,9 +112,9 @@
     <script src="plots.js"></script>
     <script src="view.js"></script>
     <script type="module">
-      import { getSessions } from './queries.js'
-  
-      getSessions()
+        import { getSessions } from './queries.js'
+
+        getSessions()
     </script>
 </body>
 </html>

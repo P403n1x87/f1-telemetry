@@ -199,7 +199,31 @@ function plotLapTraces(time, values) {
     ]
     syncMultiTimeSeries("tstemp", time, values, tyreSurfaceTemps, syncedPlots, {});
 
-    const brakesTemps = [
+    const tyreWears = [
+        {
+            name: "tyres_wear_fl",
+            label: "FL",
+            color: "cyan",
+        },
+        {
+            name: "tyres_wear_fr",
+            label: "FR",
+            color: "chartreuse",
+        },
+        {
+            name: "tyres_wear_rl",
+            label: "RL",
+            color: "orange",
+        },
+        {
+            name: "tyres_wear_rr",
+            label: "RR",
+            color: "pink",
+        }
+    ]
+    syncMultiTimeSeries("twear", time, values, tyreWears, syncedPlots, {});
+
+    const tyrePressures = [
         {
             name: "tyres_pressure_fl",
             label: "FL",
@@ -221,7 +245,7 @@ function plotLapTraces(time, values) {
             color: "pink",
         }
     ]
-    syncMultiTimeSeries("pressures", time, values, brakesTemps, syncedPlots, {});
+    syncMultiTimeSeries("pressures", time, values, tyrePressures, syncedPlots, {});
 
     traceTrack(time, values, syncedPlots);
 }

@@ -384,6 +384,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.wing_status = wing_status
 
         self.push_live("car_status", data)
+        self.push(data)
 
     def handle_FinalClassificationData(self, packet: PacketFinalClassificationData):
         self.flush()
