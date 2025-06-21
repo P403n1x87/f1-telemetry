@@ -97,3 +97,6 @@ class SessionPrinter:
             end="",
             flush=True,
         )
+
+    def print_top_speed(self, speed: int) -> None:
+        print(f"  top speed \033[30;34m{speed}\033[0m", end="", flush=True)
