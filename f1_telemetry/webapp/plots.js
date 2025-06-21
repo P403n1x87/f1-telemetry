@@ -171,7 +171,7 @@ function syncMultiTimeSeries(container, time, values, fields, group, attributes)
                 .text(`${field.label} ${value}`)
                 .attr("x", x[i] > (maxX - minX) / 2 ? - 4 : 4)
                 .attr("text-anchor", x[i] > (maxX - minX) / 2 ? "end" : "start")
-                .attr("transform", `translate(0,${labelScale(y[i])})`)
+                .attr("transform", `translate(0,${labelScale(y[i]) || height})`)
                 .attr("font-family", "F1")
                 .attr("font-size", 12)
                 ;

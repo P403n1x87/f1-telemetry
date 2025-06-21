@@ -1,27 +1,30 @@
 import threading
 import typing as t
 from bisect import bisect_left
-from collections import defaultdict, deque
+from collections import defaultdict
+from collections import deque
 from time import time
 
 import pyttsx3
 from f1.handler import PacketHandler
-from f1.packets import (
-    TYRES,
-    Packet,
-    PacketCarDamageData,
-    PacketCarTelemetryData,
-    PacketEventData,
-    PacketFinalClassificationData,
-    PacketLapData,
-    PacketParticipantsData,
-    PacketSessionData,
-    SessionType,
-)
+from f1.packets import TYRES
+from f1.packets import Packet
+from f1.packets import PacketCarDamageData
+from f1.packets import PacketCarTelemetryData
+from f1.packets import PacketEventData
+from f1.packets import PacketFinalClassificationData
+from f1.packets import PacketLapData
+from f1.packets import PacketParticipantsData
+from f1.packets import PacketSessionData
+from f1.packets import SessionType
 
 from f1_telemetry.live import enqueue
-from f1_telemetry.model import Session, SessionEventHandler
-from f1_telemetry.report import HumanCounter, QualifyingReport, RaceDirector, RaceReport
+from f1_telemetry.model import Session
+from f1_telemetry.model import SessionEventHandler
+from f1_telemetry.report import HumanCounter
+from f1_telemetry.report import QualifyingReport
+from f1_telemetry.report import RaceDirector
+from f1_telemetry.report import RaceReport
 from f1_telemetry.view import SessionPrinter
 
 
@@ -71,6 +74,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
 
         self.sink = sink
         self.queue = deque()  # To handle flashbacks
+        self.last_fields = {}
 
         self.session = Session(self)
         self.motion_data = None
@@ -113,12 +117,15 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         if (
             self.session is None
             or self.session.lap == 0
-            or self.distance < 0
+            or self.distance < self.last_fields.get("distance", 0)
             or current_time is None
         ):
             return
 
-        self.queue.append((current_time, self.session.lap, fields))
+        self.last_fields.update(fields)
+        self.last_fields["distance"] = self.distance
+
+        self.queue.append((current_time, self.session.lap, self.last_fields.copy()))
 
         # Flush data outside the flashback window
         flashback_time = current_time - 16.0
@@ -213,6 +220,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.tyre_data_emitted = False
         self.leader_distance.clear()
         self.leader_time.clear()
+        del self.last_fields["distance"]
 
     def on_finish(self, lap, sectors, best):
         try:
@@ -323,7 +331,6 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
             self.rival_motion_data = None
         self.motion_data = None
 
-        data["distance"] = self.distance
         if self.session.type == SessionType.TT:
             data["gap"] = self.gap
             if self.rival_index != 255:
@@ -386,6 +393,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.wing_status = wing_status
 
         self.push_live("car_status", data)
+
         self.push(data)
 
     def handle_FinalClassificationData(self, packet: PacketFinalClassificationData):
@@ -478,6 +486,8 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
             # We can flush the rest as we won't be flashing back beyond this
             # point in time.
             self.flush()
+
+            self.last_fields.clear()
         elif event == "PENA":
             if self.race_director is not None:
                 self.race_director.record_incident(packet.event_details.penalty)
