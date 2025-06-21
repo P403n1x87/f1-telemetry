@@ -248,6 +248,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.distance = 0.0
         self.rival_distance = 0.0
         self.last_fuel = None
+        self.max_speed = 0
 
         if self.report:
             self.drivers.clear()
@@ -483,11 +484,13 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
                     break
                 self.queue.pop()
 
+            self.last_fields.clear()
+            self.last_fields.update(self.queue[-1][2] if self.queue else {})
+
             # We can flush the rest as we won't be flashing back beyond this
             # point in time.
             self.flush()
 
-            self.last_fields.clear()
         elif event == "PENA":
             if self.race_director is not None:
                 self.race_director.record_incident(packet.event_details.penalty)
