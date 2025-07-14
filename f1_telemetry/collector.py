@@ -220,7 +220,7 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         self.tyre_data_emitted = False
         self.leader_distance.clear()
         self.leader_time.clear()
-        self.last_fields.pop("distance")
+        self.last_fields.pop("distance", None)
 
     def on_finish(self, lap, sectors, best):
         try:
