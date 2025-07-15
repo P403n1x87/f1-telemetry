@@ -145,6 +145,9 @@ class TelemetryCollector(PacketHandler, SessionEventHandler):
         if self.session is None:
             return
 
+        if _type == "trace":
+            data["distance"] = self.distance
+        
         live_data = {"type": _type, "data": data}
         if live_data == self.last_live_data.get(_type, None):
             return
