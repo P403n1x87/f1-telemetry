@@ -2,9 +2,11 @@
 name = "f1-telemetry"
 classifiers = [
   "Intended Audience :: Developers",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
 ]
 description = "F1 telemetry data collection and visualisation"
 authors = ["Gabriele N. Tornetta <phoenix1987@gmail.com>"]
@@ -20,8 +22,8 @@ lines_after_imports = 2
 profile = "black"
 
 [tool.poetry.dependencies]
-python = "^3.8"
-f1-packets = "^2025.1.0"
+python = "^3.10"
+f1-packets = "^2026.1.1"
 influxdb-client = "^1.30.0"
 websockets = "^10.3"
 pyttsx3 = "2.71"
