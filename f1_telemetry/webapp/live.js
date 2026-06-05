@@ -140,10 +140,12 @@ function updateGap(data) {
     gapField.style("color", gapColor(data));
 }
 
+const MAX_SPEED = 400;
+
 function updateTrace(data) {
     pushTraceData(
-        [data.distance, data.throttle, data.brake],
-        [data.rival_distance, data.rival_throttle, data.rival_brake]
+        [data.distance, data.throttle, data.brake, data.speed / MAX_SPEED],
+        [data.rival_distance, data.rival_throttle, data.rival_brake, data.rival_speed / MAX_SPEED]
     );
 }
 
